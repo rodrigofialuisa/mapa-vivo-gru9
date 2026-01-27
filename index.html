@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mapa Vivo de Picking – FC GRU9</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+<h1>Mapa Vivo de Erros Repetidos</h1>
+<p>Protótipo operacional – FC GRU9</p>
+</header>
+
+<section>
+<h2>O Problema</h2>
+<p>
+Em centros de distribuição de alta escala, como o FC GRU9, 
+erros de picking se repetem em bins específicos. 
+Hoje, a visualização desses pontos críticos é feita por planilhas, 
+o que dificulta a identificação rápida de padrões.
+</p>
+</section>
+
+<section>
+<h2>A Solução Proposta</h2>
+<p>
+O Mapa Vivo é uma ferramenta visual que transforma dados operacionais 
+em um mapa interativo de corredores e bins, permitindo localizar 
+instantaneamente áreas com maior incidência de erros.
+</p>
+<ul>
+<li>Corredores na vertical</li>
+<li>Bins na horizontal</li>
+<li>Cores indicando status operacional</li>
+<li>Atualização por arquivo de dados</li>
+</ul>
+</section>
+
+<section>
+<h2>Demonstração do Mapa</h2>
+<div id="mapa"></div>
+
+<div class="legenda">
+<span class="ok">OK</span>
+<span class="alerta">ALERTA</span>
+<span class="erro">ERRO</span>
+</div>
+</section>
+
+<footer>
+<p>Protótipo conceitual – Desenvolvido por Rodrigo</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
