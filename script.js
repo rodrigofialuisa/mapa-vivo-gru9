@@ -1,144 +1,56 @@
-// ================================
-// MAPA VIVO DE ERROS – FC GRU9
-// Script principal
-// ================================
+document.addEventListener("DOMContentLoaded", () => {
+    console.log("✅ Script.js carregado");
 
-// ===== CONFIGURAÇÃO DO LAYOUT =====
+    const mapaDiv = document.getElementById("mapa");
+    mapaDiv.innerHTML = "<p>🔄 Carregando mapa...</p>";
 
-// Ajuste aqui conforme o FC
-const CONFIG = {
-    blocos: {
-        "A": { corredores: [100, 300], bins: [100, 300] },
-        "B1": { corredores: [100, 300], bins: [100, 300] },
-        "B2": { corredores: [401, 600], bins: [100, 300] },
-        "C": { corredores: [100, 300], bins: [100, 300] }
-    },
-    blocoInicial: "A"
-};
+    carregarCSV();
+});
 
-// ================================
-
-let dadosCSV = {};
-let blocoAtual = CONFIG.blocoInicial;
-
-// ===== CARREGAR CSV =====
 async function carregarCSV() {
     try {
+        console.log("🔎 Tentando carregar dados.csv...");
+
         const response = await fetch("./dados.csv");
-        if (!response.ok) throw new Error("CSV não encontrado");
+
+        console.log("📡 Status HTTP:", response.status);
+
+        if (!response.ok) {
+            throw new Error("dados.csv não encontrado");
+        }
+
         const texto = await response.text();
-        dadosCSV = processarCSV(texto);
-        inicializarMapa();
+        console.log("✅ CSV carregado com sucesso!");
+        console.log(texto.substring(0,200)); // mostra começo do CSV
+
+        const dados = processarCSV(texto);
+        gerarMapaSimples(dados);
+
     } catch (erro) {
+        console.error("❌ Erro:", erro);
         document.getElementById("mapa").innerHTML =
-            "<p style='color:red'>❌ Erro ao carregar dados.csv</p>";
-        console.error("Erro ao carregar CSV:", erro);
+            "<p style='color:red'>❌ Não foi possível carregar dados.csv</p>";
     }
 }
 
-// ===== PROCESSAR CSV =====
 function processarCSV(texto) {
     const linhas = texto.trim().split("\n");
-    const resultado = {};
+    const dados = {};
 
     for (let i = 1; i < linhas.length; i++) {
-        const linha = linhas[i].trim();
-        if (!linha) continue;
-
-        const [corredor, bin, status] = linha.split(",");
-
-        if (!resultado[corredor]) resultado[corredor] = {};
-        resultado[corredor][bin] = status.trim().toUpperCase();
+        const [corredor, bin, status] = linhas[i].split(",");
+        if (!dados[corredor]) dados[corredor] = {};
+        dados[corredor][bin] = status.trim();
     }
-
-    return resultado;
+    return dados;
 }
 
-// ===== GERAR SELETOR DE BLOCOS =====
-function inicializarMapa() {
-    const container = document.getElementById("mapa");
+// mapa mínimo só para confirmar funcionamento
+function gerarMapaSimples(dados) {
+    const mapaDiv = document.getElementById("mapa");
+    mapaDiv.innerHTML = "<h3>✅ Mapa carregado com sucesso!</h3>";
 
-    // Criar seletor
-    const seletor = document.createElement("select");
-    seletor.id = "seletorBloco";
-
-    for (const bloco in CONFIG.blocos) {
-        const option = document.createElement("option");
-        option.value = bloco;
-        option.textContent = "Bloco " + bloco;
-        seletor.appendChild(option);
-    }
-
-    seletor.value = blocoAtual;
-    seletor.onchange = () => {
-        blocoAtual = seletor.value;
-        gerarMapa();
-    };
-
-    container.innerHTML = "";
-    container.appendChild(seletor);
-
-    // Criar área do mapa
-    const areaMapa = document.createElement("div");
-    areaMapa.id = "areaMapa";
-    areaMapa.style.marginTop = "15px";
-    container.appendChild(areaMapa);
-
-    gerarMapa();
+    const pre = document.createElement("pre");
+    pre.textContent = JSON.stringify(dados, null, 2);
+    mapaDiv.appendChild(pre);
 }
-
-// ===== GERAR MAPA =====
-function gerarMapa() {
-    const areaMapa = document.getElementById("areaMapa");
-    areaMapa.innerHTML = "";
-
-    const config = CONFIG.blocos[blocoAtual];
-    const [cInicio, cFim] = config.corredores;
-    const [bInicio, bFim] = config.bins;
-
-    const tabela = document.createElement("table");
-
-    // Cabeçalho bins
-    const header = document.createElement("tr");
-    header.appendChild(document.createElement("td"));
-
-    for (let b = bInicio; b <= bFim; b++) {
-        const th = document.createElement("td");
-        th.textContent = b;
-        header.appendChild(th);
-    }
-    tabela.appendChild(header);
-
-    // Linhas corredores
-    for (let c = cInicio; c <= cFim; c++) {
-        const tr = document.createElement("tr");
-
-        const label = document.createElement("td");
-        label.textContent = c;
-        label.style.fontWeight = "bold";
-        tr.appendChild(label);
-
-        for (let b = bInicio; b <= bFim; b++) {
-            const td = document.createElement("td");
-            let status = "OK";
-
-            if (dadosCSV[c] && dadosCSV[c][b]) {
-                status = dadosCSV[c][b];
-            }
-
-            if (status === "ERRO") td.className = "erro";
-            else if (status === "ALERTA") td.className = "alerta";
-            else td.className = "ok";
-
-            td.title = `Bloco ${blocoAtual} | Corredor ${c} | Bin ${b} | Status: ${status}`;
-
-            tr.appendChild(td);
-        }
-        tabela.appendChild(tr);
-    }
-
-    areaMapa.appendChild(tabela);
-}
-
-// ===== INICIAR =====
-document.addEventListener("DOMContentLoaded", carregarCSV);
