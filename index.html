@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa Vivo de Erros – FC GRU9</title>
 <link rel="stylesheet" href="style.css">
+
 <style>
 body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; color:#333; }
 header { background:#111; color:#fff; padding:40px 20px; text-align:center; }
-section { padding:40px 20px; max-width:1000px; margin:auto; background:#fff; margin-top:20px; border-radius:8px; }
+section { padding:35px 20px; max-width:1100px; margin:auto; background:#fff; margin-top:20px; border-radius:8px; box-shadow:0 0 6px rgba(0,0,0,0.08); }
 h1,h2 { color:#111; }
-.banner { text-align:center; margin-top:20px; }
-.banner img { max-width:100%; border-radius:8px; }
-.lista { margin-top:10px; }
+p { line-height:1.6; }
 .lista li { margin-bottom:8px; }
-.mapa-container { overflow-x:auto; border:1px solid #ccc; padding:10px; }
+.banner { text-align:center; margin-top:15px; }
+.banner img { max-width:100%; border-radius:6px; border:1px solid #ddd; }
+.mapa-container { overflow:auto; border:1px solid #ccc; padding:10px; background:#fafafa; }
 table { border-collapse:collapse; }
-td { width:22px; height:22px; text-align:center; font-size:8px; }
-.ok { background:#4CAF50; }
-.alerta { background:#FFC107; }
-.erro { background:#F44336; color:#fff; }
+td { width:22px; height:22px; text-align:center; font-size:8px; border:1px solid #ddd; }
+.ok { background:#2ecc71; }
+.alerta { background:#f1c40f; }
+.erro { background:#e74c3c; color:#fff; }
+.legenda span { padding:5px 10px; margin-right:8px; border-radius:4px; font-size:12px; }
 footer { text-align:center; padding:20px; font-size:12px; color:#666; }
 </style>
 </head>
@@ -28,53 +30,58 @@ footer { text-align:center; padding:20px; font-size:12px; color:#666; }
 
 <header>
 <h1>Mapa Vivo de Erros Repetidos</h1>
-<p>Protótipo operacional – Amazon FC GRU9</p>
-<p>Proposta desenvolvida por: <strong>Rodrigo Lopes</strong> – Picking</p>
+<p>Protótipo de Melhoria Operacional – Amazon FC GRU9</p>
+<p>Proposta desenvolvida por: <strong>Rodrigo Lopes – Picking</strong></p>
 </header>
 
 <section>
 <h2>🎯 Objetivo</h2>
 <p>
-Criar uma ferramenta visual inteligente para identificar rapidamente bins e corredores com reincidência de erros operacionais no setor de Picking do FC GRU9.
+Criar uma ferramenta visual inteligente para identificar rapidamente corredores e bins 
+com reincidência de erros operacionais no setor de Picking, permitindo ações corretivas 
+mais rápidas e direcionadas dentro do FC GRU9.
 </p>
 </section>
 
 <section>
-<h2>❗ O Problema Atual</h2>
+<h2>❗ Problema Atual</h2>
 <p>
-Hoje, erros de picking são analisados principalmente por planilhas e relatórios textuais.  
-Esse formato dificulta a visualização rápida de padrões físicos dentro do armazém, atrasando ações corretivas.
+Atualmente, a análise de erros de picking é realizada por meio de planilhas e relatórios textuais. 
+Embora funcionais, esses formatos dificultam a visualização física dos pontos críticos no armazém, 
+tornando a identificação de padrões lenta e reativa.
 </p>
 
 <ul class="lista">
-<li>Dificuldade em identificar bins críticos visualmente</li>
+<li>Dificuldade em visualizar bins críticos no layout real</li>
 <li>Análises manuais demoradas</li>
-<liAções corretivas reativas</li>
-<li>Repetição de erros nos mesmos pontos</li>
+<li>Reincidência de erros nos mesmos locais</li>
+<li>Ações corretivas tardias</li>
 </ul>
 
 <div class="banner">
-<p><strong>Espaço para imagem ilustrando planilha atual</strong></p>
+<p><strong>Espaço para imagem – Exemplo de planilha atual</strong></p>
 <img src="imagens/exemplo-planilha.png" alt="Exemplo planilha">
 </div>
 </section>
 
 <section>
-<h2>💡 A Solução Proposta</h2>
+<h2>💡 Solução Proposta</h2>
 <p>
-O <strong>Mapa Vivo de Erros</strong> transforma dados operacionais em um mapa físico digital do FC, permitindo localizar instantaneamente pontos críticos.
+O <strong>Mapa Vivo de Erros</strong> converte dados operacionais em um mapa digital do FC, 
+reproduzindo a disposição real de corredores e bins. Cada bin recebe uma cor conforme 
+seu nível de incidência de erro, permitindo localizar instantaneamente áreas críticas.
 </p>
 
 <ul class="lista">
-<li>Corredores exibidos na vertical</li>
-<li>Bins exibidos na horizontal</li>
-<li>Cores indicando nível de erro</li>
+<li>Corredores representados na vertical</li>
+<li>Bins representados na horizontal</li>
+<li>Cores indicam status operacional</li>
 <li>Atualização automática via arquivo CSV</li>
-<li>Visualização idêntica ao layout real do FC</li>
+<li>Layout inspirado no ambiente real do FC</li>
 </ul>
 
 <div class="banner">
-<p><strong>Espaço para imagem do layout real do FC</strong></p>
+<p><strong>Espaço para imagem – Layout físico do FC</strong></p>
 <img src="imagens/layout-fc.png" alt="Layout FC">
 </div>
 </section>
@@ -82,85 +89,65 @@ O <strong>Mapa Vivo de Erros</strong> transforma dados operacionais em um mapa f
 <section>
 <h2>⚙️ Como Funciona</h2>
 
-<p><strong>1.</strong> O sistema recebe um arquivo CSV com dados de erros por bin.</p>
-<p><strong>2.</strong> O HTML lê automaticamente esse arquivo.</p>
-<p><strong>3.</strong> Cada bin recebe uma cor conforme seu status.</p>
-<p><strong>4.</strong> O gestor visualiza instantaneamente áreas críticas.</p>
-<p><strong>5.</strong> A equipe atua diretamente nos pontos problemáticos.</p>
+<p><strong>1.</strong> O sistema recebe um arquivo CSV contendo registros de erros por bin.</p>
+<p><strong>2.</strong> O site lê automaticamente esses dados.</p>
+<p><strong>3.</strong> Cada bin recebe uma cor conforme o status identificado.</p>
+<p><strong>4.</strong> Gestores visualizam imediatamente os pontos críticos.</p>
+<p><strong>5.</strong> A equipe atua de forma direcionada nas áreas problemáticas.</p>
 
 <div class="banner">
-<p><strong>Espaço para imagem do fluxo do sistema</strong></p>
-<img src="imagens/fluxo-sistema.png" alt="Fluxo do sistema">
+<p><strong>Espaço para imagem – Fluxo do sistema</strong></p>
+<img src="imagens/fluxo-sistema.png" alt="Fluxo Sistema">
 </div>
 </section>
 
 <section>
-<h2>📊 Benefícios Operacionais</h2>
+<h2>📊 Benefícios Esperados</h2>
 <ul class="lista">
-<li>Redução de reincidência de erros</li>
-<li>Resposta rápida a falhas operacionais</li>
-<li>Treinamento direcionado por área</li>
+<li>Redução da reincidência de erros de picking</li>
+<li>Identificação rápida de gargalos operacionais</li>
+<li>Treinamento direcionado por área crítica</li>
 <li>Melhoria contínua baseada em dados</li>
 <li>Baixo custo de implementação</li>
 </ul>
 </section>
 
 <section>
-<h2>🧪 Demonstração do Protótipo</h2>
-<p>Exemplo de visualização simulada de bins com cores por status:</p>
+<h2>🧪 Protótipo do Mapa Vivo</h2>
 
-<p>
-<span style="background:#4CAF50;padding:4px 10px;color:#fff;">OK</span>
-<span style="background:#FFC107;padding:4px 10px;">ALERTA</span>
-<span style="background:#F44336;padding:4px 10px;color:#fff;">ERRO</span>
-</p>
+<p>Legenda de status:</p>
+<div class="legenda">
+<span class="ok">OK</span>
+<span class="alerta">ALERTA</span>
+<span class="erro">ERRO</span>
+</div>
 
-<div class="mapa-container" id="mapa"></div>
+<br>
+
+<div class="mapa-container" id="mapa">
+<!-- O mapa será carregado automaticamente aqui -->
+</div>
+
 </section>
 
 <section>
-<h2>🚀 Potencial de Expansão</h2>
+<h2>🚀 Possibilidades de Expansão</h2>
 <ul class="lista">
 <li>Integração com banco de dados interno</li>
 <li>Atualização em tempo real</li>
-<li>Dashboard por setor</li>
-<li>Relatórios automáticos</li>
-<li>Histórico por turno</li>
+<li>Dashboard por bloco e turno</li>
+<li>Histórico de reincidência por período</li>
+<li>Alertas automáticos de pontos críticos</li>
 </ul>
 </section>
 
 <footer>
-Protótipo conceitual – Desenvolvido por Rodrigo Lopes  
-<br>Mapa Vivo de Erros – FC GRU9
+Protótipo conceitual de melhoria operacional – FC GRU9  
+<br>Desenvolvido por Rodrigo Lopes
 </footer>
 
-<script>
-fetch('dados.csv')
-.then(r => r.text())
-.then(texto => {
- let linhas = texto.trim().split('\n');
- let dados = linhas.slice(1).map(l => l.split(','));
- let corredores = [...new Set(dados.map(d => d[1]))].sort((a,b)=>a-b);
- let bins = [...new Set(dados.map(d => d[2]))].sort((a,b)=>a-b);
-
- let html = '<table><tr><td></td>';
- bins.forEach(b => html += `<td><strong>${b}</strong></td>`);
- html += '</tr>';
-
- corredores.forEach(c => {
-   html += `<tr><td><strong>${c}</strong></td>`;
-   bins.forEach(b => {
-     let reg = dados.find(d => d[1]==c && d[2]==b);
-     let status = reg ? reg[3].toLowerCase() : '';
-     html += `<td class="${status}" title="Corredor ${c} - Bin ${b}">${b}</td>`;
-   });
-   html += '</tr>';
- });
-
- html += '</table>';
- document.getElementById('mapa').innerHTML = html;
-});
-</script>
+<!-- Script do Mapa -->
+<script src="script.js"></script>
 
 </body>
 </html>
