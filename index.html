@@ -4,25 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa Vivo de Erros – FC GRU9</title>
+
 <link rel="stylesheet" href="style.css">
 
 <style>
 body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; color:#333; }
-header { background:#111; color:#fff; padding:40px 20px; text-align:center; }
-section { padding:35px 20px; max-width:1100px; margin:auto; background:#fff; margin-top:20px; border-radius:8px; box-shadow:0 0 6px rgba(0,0,0,0.08); }
+header { background:#111; color:#fff; padding:30px; text-align:center; }
+section { padding:30px; max-width:1100px; margin:auto; background:#fff; margin-top:20px; border-radius:8px; }
 h1,h2 { color:#111; }
-p { line-height:1.6; }
-.lista li { margin-bottom:8px; }
-.banner { text-align:center; margin-top:15px; }
-.banner img { max-width:100%; border-radius:6px; border:1px solid #ddd; }
-.mapa-container { overflow:auto; border:1px solid #ccc; padding:10px; background:#fafafa; }
+.mapa-container { overflow:auto; border:1px solid #ccc; margin-top:20px; }
 table { border-collapse:collapse; }
-td { width:22px; height:22px; text-align:center; font-size:8px; border:1px solid #ddd; }
-.ok { background:#2ecc71; }
-.alerta { background:#f1c40f; }
-.erro { background:#e74c3c; color:#fff; }
-.legenda span { padding:5px 10px; margin-right:8px; border-radius:4px; font-size:12px; }
-footer { text-align:center; padding:20px; font-size:12px; color:#666; }
+td { width:18px; height:18px; text-align:center; font-size:7px; }
+.ok { background:#4CAF50; }
+.alerta { background:#FFC107; }
+.erro { background:#F44336; color:#fff; }
+footer { text-align:center; padding:20px; font-size:12px; color:#666; margin-top:30px; }
 </style>
 </head>
 
@@ -30,123 +26,78 @@ footer { text-align:center; padding:20px; font-size:12px; color:#666; }
 
 <header>
 <h1>Mapa Vivo de Erros Repetidos</h1>
-<p>Protótipo de Melhoria Operacional – Amazon FC GRU9</p>
+<p>Protótipo operacional – Amazon FC GRU9</p>
 <p>Proposta desenvolvida por: <strong>Rodrigo Lopes – Picking</strong></p>
 </header>
 
 <section>
-<h2>🎯 Objetivo</h2>
+<h2>📌 Objetivo</h2>
 <p>
-Criar uma ferramenta visual inteligente para identificar rapidamente corredores e bins 
-com reincidência de erros operacionais no setor de Picking, permitindo ações corretivas 
-mais rápidas e direcionadas dentro do FC GRU9.
+Criar uma ferramenta visual inteligente para localizar rapidamente corredores e bins com reincidência de erros operacionais no setor de Picking.
 </p>
 </section>
 
 <section>
 <h2>❗ Problema Atual</h2>
 <p>
-Atualmente, a análise de erros de picking é realizada por meio de planilhas e relatórios textuais. 
-Embora funcionais, esses formatos dificultam a visualização física dos pontos críticos no armazém, 
-tornando a identificação de padrões lenta e reativa.
+Atualmente os erros de picking são analisados através de planilhas e relatórios textuais.  
+Esse formato dificulta enxergar padrões físicos dentro do armazém, atrasando ações corretivas.
 </p>
 
-<ul class="lista">
-<li>Dificuldade em visualizar bins críticos no layout real</li>
+<ul>
+<li>Dificuldade em identificar bins críticos</li>
 <li>Análises manuais demoradas</li>
-<li>Reincidência de erros nos mesmos locais</li>
-<li>Ações corretivas tardias</li>
+<li>Correções reativas</li>
+<li>Repetição de erros nos mesmos pontos</li>
 </ul>
-
-<div class="banner">
-<p><strong>Espaço para imagem – Exemplo de planilha atual</strong></p>
-<img src="imagens/exemplo-planilha.png" alt="Exemplo planilha">
-</div>
 </section>
 
 <section>
 <h2>💡 Solução Proposta</h2>
 <p>
-O <strong>Mapa Vivo de Erros</strong> converte dados operacionais em um mapa digital do FC, 
-reproduzindo a disposição real de corredores e bins. Cada bin recebe uma cor conforme 
-seu nível de incidência de erro, permitindo localizar instantaneamente áreas críticas.
+O <strong>Mapa Vivo de Erros</strong> transforma dados operacionais em um mapa físico digital do FC, permitindo identificar instantaneamente pontos críticos.
 </p>
 
-<ul class="lista">
-<li>Corredores representados na vertical</li>
-<li>Bins representados na horizontal</li>
-<li>Cores indicam status operacional</li>
-<li>Atualização automática via arquivo CSV</li>
-<li>Layout inspirado no ambiente real do FC</li>
+<ul>
+<li>Corredores na vertical</li>
+<li>Bins na horizontal</li>
+<li>Cores por nível de erro</li>
+<li>Atualização automática via CSV</li>
+<li>Visual idêntico ao layout real do FC</li>
 </ul>
-
-<div class="banner">
-<p><strong>Espaço para imagem – Layout físico do FC</strong></p>
-<img src="imagens/layout-fc.png" alt="Layout FC">
-</div>
 </section>
 
 <section>
 <h2>⚙️ Como Funciona</h2>
-
-<p><strong>1.</strong> O sistema recebe um arquivo CSV contendo registros de erros por bin.</p>
-<p><strong>2.</strong> O site lê automaticamente esses dados.</p>
-<p><strong>3.</strong> Cada bin recebe uma cor conforme o status identificado.</p>
-<p><strong>4.</strong> Gestores visualizam imediatamente os pontos críticos.</p>
-<p><strong>5.</strong> A equipe atua de forma direcionada nas áreas problemáticas.</p>
-
-<div class="banner">
-<p><strong>Espaço para imagem – Fluxo do sistema</strong></p>
-<img src="imagens/fluxo-sistema.png" alt="Fluxo Sistema">
-</div>
+<ol>
+<li>O sistema recebe um arquivo CSV exportado dos relatórios de erro.</li>
+<li>O script lê automaticamente os dados.</li>
+<li>Cada bin recebe uma cor conforme seu status.</li>
+<li>Gestores visualizam áreas críticas em segundos.</li>
+<li>Ações corretivas são direcionadas exatamente onde necessário.</li>
+</ol>
 </section>
 
 <section>
-<h2>📊 Benefícios Esperados</h2>
-<ul class="lista">
-<li>Redução da reincidência de erros de picking</li>
-<li>Identificação rápida de gargalos operacionais</li>
-<li>Treinamento direcionado por área crítica</li>
-<li>Melhoria contínua baseada em dados</li>
-<li>Baixo custo de implementação</li>
-</ul>
-</section>
+<h2>🧪 Protótipo do Mapa</h2>
+<p>Legenda:</p>
+<p>
+🟩 Verde — Operação normal  
+🟨 Amarelo — Atenção  
+🟥 Vermelho — Erro crítico
+</p>
 
-<section>
-<h2>🧪 Protótipo do Mapa Vivo</h2>
-
-<p>Legenda de status:</p>
-<div class="legenda">
-<span class="ok">OK</span>
-<span class="alerta">ALERTA</span>
-<span class="erro">ERRO</span>
+<div class="mapa-container">
+    <div id="mapa">Carregando mapa...</div>
 </div>
 
-<br>
-
-<div class="mapa-container" id="mapa">
-<!-- O mapa será carregado automaticamente aqui -->
-</div>
-
-</section>
-
-<section>
-<h2>🚀 Possibilidades de Expansão</h2>
-<ul class="lista">
-<li>Integração com banco de dados interno</li>
-<li>Atualização em tempo real</li>
-<li>Dashboard por bloco e turno</li>
-<li>Histórico de reincidência por período</li>
-<li>Alertas automáticos de pontos críticos</li>
-</ul>
 </section>
 
 <footer>
-Protótipo conceitual de melhoria operacional – FC GRU9  
-<br>Desenvolvido por Rodrigo Lopes
+Protótipo conceitual — Sistema piloto para melhoria operacional no FC GRU9  
 </footer>
 
-<!-- Script do Mapa -->
+<!-- SCRIPT SEMPRE NO FINAL -->
 <script src="script.js"></script>
 
 </body>
