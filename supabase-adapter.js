@@ -12,8 +12,8 @@
   /* ── Aguarda config injetada pelo host ── */
   var CFG_KEY = 'SUPA_CONFIG';
   var _cfg = global[CFG_KEY] || {};
-  var SUPA_URL  = _cfg.url     || '';
-  var ANON_KEY  = _cfg.anonKey || '';
+  var SUPA_URL  = _cfg.url     || 'https://ykzoioswmakbxpcmeydf.supabase.co';
+  var ANON_KEY  = _cfg.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlrem9pb3N3bWFrYnhwY21leWRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4OTU0MDgsImV4cCI6MjA5MjQ3MTQwOH0.4ifGxZ6PbnjkQEY_la_ijQ5QR3pYvVcUeVfbiCtsggU';
   var FNS_BASE  = _cfg.fnsBase || (SUPA_URL + '/functions/v1');
   var ADMIN_TOKEN_KEY = 'admin_token';
 
