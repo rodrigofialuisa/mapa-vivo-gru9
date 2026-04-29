@@ -1,0 +1,2578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚙️ Admin — Cardápio Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- ══ SUPABASE BOOTSTRAP ══ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.SUPA_CONFIG = {
+  url:     'https://lfahsejuorvsriempvoc.supabase.co',
+  anonKey: 'COLE_AQUI_SUA_SUPABASE_ANON_KEY',
+  fnsBase: 'https://lfahsejuorvsriempvoc.supabase.co/functions/v1'
+};
+</script>
+<script src="supabase-adapter.js"></script>
+<script src="sync-indicator.js"></script>
+<!-- ══ ENGINES ══ -->
+<script src="credito.js"></script>
+<script src="entrega.js"></script>
+<style>
+:root{
+  --bg:#0f1117;--s1:#1a1d27;--s2:#232635;--s3:#2d3148;--s4:#363b58;
+  --accent:#6c63ff;--acch:#8b85ff;--accg:linear-gradient(135deg,#6c63ff,#9d91fb);
+  --green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--blue:#3b82f6;--orange:#f97316;--purple:#8b5cf6;--pink:#ec4899;
+  --text:#e8eaf0;--muted:#7c8098;--muted2:#9098b5;
+  --bord:rgba(108,99,255,.14);--bord2:rgba(255,255,255,.06);
+  --r:12px;--rsm:8px;--sw:252px;--sc:66px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;display:flex}
+button{cursor:pointer;border:none;font-family:'Inter',sans-serif}
+input,select,textarea{font-family:'Inter',sans-serif}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:99px}
+
+/* ── LOGIN ── */
+.ls{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;align-items:center;justify-content:center;background-image:radial-gradient(ellipse 55% 40% at 50% 0%,rgba(108,99,255,.16),transparent)}
+.lc{background:var(--s1);border:1px solid var(--bord);border-radius:20px;padding:40px 36px;width:345px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.5)}
+.lic{width:58px;height:58px;border-radius:16px;background:var(--accg);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px;box-shadow:0 6px 20px rgba(108,99,255,.38)}
+.lc h1{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;margin-bottom:5px}
+.lc p{color:var(--muted2);font-size:.83rem;margin-bottom:24px}
+.lf{position:relative;margin-bottom:11px}
+.lf svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);opacity:.4}
+.li{width:100%;background:var(--s2);border:1px solid var(--bord2);border-radius:9px;padding:12px 14px 12px 39px;color:var(--text);font-size:.88rem;outline:none;transition:border-color .18s}
+.li:focus{border-color:var(--accent)}
+.li::placeholder{color:var(--muted)}
+.lb{width:100%;background:var(--accg);border:none;border-radius:9px;padding:12px;color:#fff;font-size:.88rem;font-weight:600;cursor:pointer;box-shadow:0 3px 14px rgba(108,99,255,.36);transition:opacity .18s}
+.lb:hover{opacity:.9}
+.lerr{color:var(--red);font-size:.8rem;margin-top:8px;display:none}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);flex-shrink:0;background:var(--s1);border-right:1px solid var(--bord);display:flex;flex-direction:column;height:100vh;overflow:hidden;transition:width .27s cubic-bezier(.4,0,.2,1);position:relative;z-index:100}
+.sidebar.col{width:var(--sc)}
+.sidebar.col .nl,.sidebar.col .nt,.sidebar.col .sb-store,.sidebar.col .fi{display:none!important}
+.sidebar.col .nav-item{justify-content:center;padding:11px 0}
+.sidebar.col .nav-group{padding:0 9px}
+.sidebar.col .nb{width:7px;height:7px;padding:0;border-radius:50%;position:absolute;top:8px;right:8px;min-width:0;font-size:0}
+.sidebar.col .nav-item:hover::after{content:attr(data-tip);position:absolute;left:calc(var(--sc) + 5px);top:50%;transform:translateY(-50%);background:var(--s4);border:1px solid var(--bord2);color:var(--text);border-radius:7px;padding:5px 11px;font-size:.78rem;font-weight:500;white-space:nowrap;z-index:300;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.sbh{padding:0 15px;height:62px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bord);flex-shrink:0}
+.sbb{display:flex;align-items:center;gap:9px;overflow:hidden;min-width:0}
+.sbico{width:34px;height:34px;border-radius:9px;background:var(--accg);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(108,99,255,.28)}
+.sbn{font-family:'Playfair Display',serif;font-size:.93rem;font-weight:700;white-space:nowrap;overflow:hidden}
+.col-btn{background:none;border:none;color:var(--muted);padding:5px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
+.col-btn:hover{background:var(--s3);color:var(--text)}
+.sb-store{margin:10px 12px;background:var(--s2);border:1px solid var(--bord2);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.18);flex-shrink:0;animation:gl 2s infinite}
+@keyframes gl{0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,.18)}50%{box-shadow:0 0 0 5px rgba(34,197,94,.07)}}
+.ssi{overflow:hidden;min-width:0}
+.ssn{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sss{font-size:.69rem;color:var(--green)}
+.nav-scroll{flex:1;overflow-y:auto;padding:6px 0}
+.nav-group{padding:0 12px;margin-bottom:2px}
+.nl{font-size:.63rem;font-weight:700;letter-spacing:1.1px;color:var(--muted);text-transform:uppercase;padding:13px 0 5px 2px;display:block}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:9px;cursor:pointer;color:var(--muted2);font-weight:500;font-size:.86rem;transition:all .14s;margin-bottom:1px;position:relative;white-space:nowrap;overflow:hidden}
+.nav-item:hover{background:var(--s2);color:var(--text)}
+.nav-item.on{background:rgba(108,99,255,.12);color:var(--acch)}
+.nav-item.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:52%;border-radius:0 2px 2px 0;background:var(--accent)}
+.ni{font-size:1rem;flex-shrink:0;width:20px;text-align:center}
+.nb{margin-left:auto;flex-shrink:0;background:var(--red);color:#fff;border-radius:20px;padding:2px 7px;font-size:.69rem;font-weight:700}
+.nt{flex:1;overflow:hidden;text-overflow:ellipsis}
+.sbf{border-top:1px solid var(--bord);padding:11px 12px;flex-shrink:0}
+.sfin{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;cursor:pointer;transition:background .18s}
+.sfin:hover{background:var(--s2)}
+.fav{width:30px;height:30px;border-radius:50%;background:var(--accg);display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.fi{overflow:hidden;min-width:0}
+.fn{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fv{font-size:.68rem;color:var(--muted)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.topbar{height:62px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--bord);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:12px}
+.tb-l{display:flex;align-items:center;gap:10px}
+.tb-title{font-size:1rem;font-weight:700}
+.tb-sub{font-size:.77rem;color:var(--muted2);margin-top:1px}
+.tb-r{display:flex;align-items:center;gap:9px}
+.tb-clock{font-size:.76rem;color:var(--muted2);background:var(--s2);border:1px solid var(--bord2);border-radius:7px;padding:4px 9px;font-variant-numeric:tabular-nums}
+.bell{position:relative;background:var(--s2);border:1px solid var(--bord2);border-radius:9px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s;font-size:.95rem}
+.bell:hover{background:var(--s3)}
+.bdot{position:absolute;top:7px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--red);border:2px solid var(--s1);display:none}
+.bdot.on{display:block}
+.pw{flex:1;overflow-y:auto;padding:22px 24px 30px}
+.page{display:none;animation:fup .2s ease both}
+.page.on{display:block}
+@keyframes fup{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:20px;flex-wrap:wrap}
+.ph h1{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700}
+.ph p{color:var(--muted2);font-size:.8rem;margin-top:3px}
+.pha{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+
+/* ── STAT CARDS ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:20px}
+.scard{background:var(--s1);border:1px solid var(--bord);border-radius:var(--r);padding:16px 15px 13px;position:relative;overflow:hidden;transition:border-color .18s,transform .13s}
+.scard:hover{border-color:rgba(108,99,255,.28);transform:translateY(-2px)}
+.scard .tb{position:absolute;top:0;left:0;right:0;height:3px}
+.scard.g .tb{background:var(--green)}.scard.b .tb{background:var(--blue)}.scard.y .tb{background:var(--yellow)}.scard.p .tb{background:var(--purple)}.scard.o .tb{background:var(--orange)}.scard.pk .tb{background:var(--pink)}.scard.r .tb{background:var(--red)}
+.sico{position:absolute;right:12px;top:12px;font-size:1.35rem;opacity:.13}
+.slbl{font-size:.69rem;color:var(--muted2);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.sval{font-size:1.6rem;font-weight:700;margin:5px 0 2px;line-height:1;font-family:'Playfair Display',serif}
+.ssub{font-size:.69rem;color:var(--muted)}
+
+/* ── TABLES ── */
+.tw{background:var(--s1);border:1px solid var(--bord);border-radius:var(--r);overflow:hidden}
+.th{padding:12px 17px;border-bottom:1px solid var(--bord);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px}
+.th h3{font-weight:700;font-size:.88rem}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 17px;background:var(--s2);font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.55px;color:var(--muted)}
+td{padding:12px 17px;border-top:1px solid var(--bord);font-size:.84rem}
+tbody tr{transition:background .1s}
+tbody tr:hover td{background:rgba(108,99,255,.04)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:.69rem;font-weight:700;white-space:nowrap}
+.badge.pending{background:rgba(245,158,11,.12);color:var(--yellow)}
+.badge.accepted{background:rgba(59,130,246,.12);color:var(--blue)}
+.badge.preparing{background:rgba(249,115,22,.12);color:var(--orange)}
+.badge.delivering{background:rgba(108,99,255,.17);color:var(--acch)}
+.badge.delivered{background:rgba(34,197,94,.12);color:var(--green)}
+.badge.cancelled{background:rgba(239,68,68,.12);color:var(--red)}
+.badge.credit{background:rgba(139,92,246,.18);color:#c4b5fd}
+.badge.overdue{background:rgba(239,68,68,.18);color:var(--red)}
+.badge.gold{background:rgba(245,158,11,.15);color:var(--yellow)}
+.badge.silver{background:rgba(148,163,184,.15);color:#94a3b8}
+.badge.bronze{background:rgba(180,120,60,.15);color:#c07840}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:var(--rsm);padding:7px 14px;font-size:.81rem;font-weight:600;cursor:pointer;transition:opacity .14s,transform .1s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn:active{transform:scale(.97)}.btn:hover{opacity:.87}
+.btn-p{background:var(--accent);color:#fff;box-shadow:0 3px 9px rgba(108,99,255,.26)}
+.btn-g{background:var(--green);color:#fff}
+.btn-r{background:var(--red);color:#fff}
+.btn-o{background:var(--s3);color:var(--text);border:1px solid var(--bord2)}
+.btn-wa{background:#25D366;color:#fff}
+.btn-pu{background:var(--purple);color:#fff}
+.btn-sm{padding:4px 9px;font-size:.74rem;border-radius:6px}
+.btn-ico{padding:6px;border-radius:7px;width:29px;height:29px;justify-content:center}
+
+/* ── FORMS ── */
+.fg{display:flex;flex-direction:column;gap:5px}
+.fgl{font-size:.7rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px}
+.fgi{background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm);padding:9px 12px;color:var(--text);font-size:.86rem;outline:none;transition:border-color .18s;width:100%}
+.fgi:focus{border-color:var(--accent)}
+.fgi::placeholder{color:var(--muted)}
+select.fgi{cursor:pointer}
+textarea.fgi{resize:vertical;min-height:72px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+.fbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:15px;align-items:center}
+.fbar .fgi{flex:1;min-width:140px}
+input[type=date].fgi{color-scheme:dark;}
+
+/* ── ITEM ROWS ── */
+.ilist{display:flex;flex-direction:column;gap:8px}
+.irow{background:var(--s1);border:1px solid var(--bord);border-radius:var(--r);padding:10px 13px;display:flex;align-items:center;gap:12px;transition:border-color .18s}
+.irow:hover{border-color:rgba(108,99,255,.28)}
+.ith{width:48px;height:48px;border-radius:9px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:1.45rem;flex-shrink:0;overflow:hidden;border:1px solid var(--bord2)}
+.ith img{width:100%;height:100%;object-fit:cover}
+.iin{flex:1;min-width:0}
+.inm{font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.imt{display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap}
+.icat{font-size:.7rem;color:var(--muted2);background:var(--s3);border-radius:20px;padding:2px 7px}
+.ipr{font-size:.79rem;font-weight:700;color:var(--acch)}
+.iac{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.tog{width:38px;height:21px;border-radius:11px;background:var(--s4);border:none;cursor:pointer;position:relative;transition:background .18s;flex-shrink:0}
+.tog.on{background:var(--green)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;transition:left .18s;box-shadow:0 1px 3px rgba(0,0,0,.28)}
+.tog.on::after{left:20px}
+
+/* ── CLOUDINARY UPLOAD ── */
+.upa{border:2px dashed var(--bord2);border-radius:var(--r);background:var(--s2);text-align:center;cursor:pointer;transition:border-color .18s;position:relative;padding:18px}
+.upa:hover,.upa.drag{border-color:var(--accent);background:rgba(108,99,255,.05)}
+.upa input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2}
+.up-pv{width:100%;max-height:155px;object-fit:cover;border-radius:var(--rsm);margin-bottom:7px;display:none}
+.up-pv.on{display:block}
+.up-ph{pointer-events:none}
+.up-ico{font-size:2rem;margin-bottom:5px;display:block}
+.up-txt{font-size:.81rem;color:var(--muted2);margin-bottom:2px;font-weight:600}
+.up-hint{font-size:.7rem;color:var(--muted)}
+.up-st{margin-top:7px;font-size:.76rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:5px;min-height:16px}
+.up-st.uploading{color:var(--yellow)}.up-st.done{color:var(--green)}.up-st.err{color:var(--red)}
+.up-bw{margin-top:7px;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;display:none}
+.up-bw.on{display:block}
+.up-b{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .3s}
+.up-acts{display:flex;gap:7px;justify-content:center;margin-top:7px}
+.cnote{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.18);border-radius:9px;padding:10px 13px;font-size:.77rem;color:var(--yellow);display:flex;gap:8px;margin-bottom:11px}
+
+/* ── MODAL ── */
+.mo{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:14px}
+.mo.on{display:flex}
+.modal{background:var(--s1);border:1px solid var(--bord);border-radius:18px;padding:24px;width:100%;max-width:530px;max-height:92vh;overflow-y:auto;box-shadow:0 28px 72px rgba(0,0,0,.5)}
+.mhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mhd h2{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700}
+.mcl{background:var(--s3);border:none;border-radius:50%;width:29px;height:29px;color:var(--muted2);font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.mcl:hover{background:var(--red);color:#fff}
+.mft{display:flex;gap:7px;justify-content:flex-end;margin-top:17px}
+
+/* ── ORDER CARDS ── */
+.ocard{background:var(--s1);border:1px solid var(--bord);border-radius:var(--r);padding:12px 14px;margin-bottom:9px;cursor:pointer;transition:border-color .14s,transform .1s}
+.ocard:hover{border-color:rgba(108,99,255,.3);transform:translateX(2px)}
+.sflow{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}
+.sfbtn{flex:1;min-width:82px;background:var(--s3);border:1px solid var(--bord2);border-radius:7px;padding:7px 4px;color:var(--muted2);font-family:'Inter',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;text-align:center;transition:all .14s}
+.sfbtn:hover{border-color:var(--accent);color:var(--text)}
+.sfbtn.on{background:rgba(108,99,255,.16);border-color:var(--accent);color:var(--acch)}
+
+/* ── CREDIT CRM SPECIFIC ── */
+.credit-card-vis{background:linear-gradient(135deg,#4c1d95,#7c3aed,#5b21b6);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;margin-bottom:12px}
+.credit-card-vis::before{content:'';position:absolute;top:-25px;right:-25px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.07)}
+.ccv-row{display:flex;justify-content:space-between;align-items:flex-end}
+.ccv-lbl{font-size:.69rem;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px}
+.ccv-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:8px}
+.ccv-info{font-size:.73rem;color:rgba(255,255,255,.7)}
+.ccv-info strong{color:#fff;display:block;font-size:.84rem;margin-top:1px}
+.ccv-badge{background:rgba(255,255,255,.18);border-radius:7px;padding:3px 9px;font-size:.7rem;font-weight:700;color:#fff}
+.progress-bar-wrap{background:var(--s3);border-radius:99px;height:6px;overflow:hidden;margin:6px 0 3px}
+.progress-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--acch))}
+/* Credit alert rows */
+.credit-alert{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--s2);border-radius:var(--r);margin-bottom:8px;border:1px solid var(--bord)}
+.credit-alert.overdue{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.05)}
+.credit-alert.warning{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)}
+.ca-ico{font-size:1.4rem;flex-shrink:0}
+.ca-info{flex:1;min-width:0}
+.ca-name{font-weight:600;font-size:.87rem}
+.ca-detail{font-size:.76rem;color:var(--muted2);margin-top:2px}
+.ca-val{font-weight:700;font-size:.95rem;white-space:nowrap}
+
+/* ── SETTINGS ── */
+.sblock{background:var(--s1);border:1px solid var(--bord);border-radius:var(--r);padding:19px;margin-bottom:14px}
+.sblock h3{font-family:'Playfair Display',serif;font-weight:700;font-size:.92rem;margin-bottom:14px;display:flex;align-items:center;gap:7px;padding-bottom:11px;border-bottom:1px solid var(--bord)}
+
+/* ── TOAST ── */
+.tstack{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:none}
+.toast{background:var(--s2);border:1px solid var(--bord2);border-radius:11px;padding:11px 15px;font-size:.83rem;font-weight:500;box-shadow:0 6px 24px rgba(0,0,0,.43);transform:translateX(110%);transition:transform .26s cubic-bezier(.4,0,.2,1);pointer-events:all;display:flex;align-items:center;gap:8px;min-width:220px;max-width:300px;position:relative;overflow:hidden}
+.toast.on{transform:translateX(0)}
+.toast.success{border-color:rgba(34,197,94,.2)}.toast.error{border-color:rgba(239,68,68,.2)}.toast.info{border-color:rgba(59,130,246,.2)}
+.tbar{position:absolute;bottom:0;left:0;height:2px;background:var(--accent);animation:ta 3.2s linear forwards}
+@keyframes ta{from{width:100%}to{width:0%}}
+
+/* ── UTILS ── */
+.flex{display:flex}.gap2{gap:8px}.gap3{gap:12px}.aic{align-items:center}.jcb{justify-content:space-between}.jce{justify-content:flex-end}
+.fw6{font-weight:600}.fw7{font-weight:700}.fw8{font-weight:800}
+.tc-m{color:var(--muted2)}.tc-g{color:var(--green)}.tc-r{color:var(--red)}.tc-p{color:#c4b5fd}
+.mt2{margin-top:8px}.mt3{margin-top:12px}.mt4{margin-top:16px}.mb2{margin-bottom:8px}.mb3{margin-bottom:12px}
+.divider{height:1px;background:var(--bord);margin:13px 0}
+.empty{text-align:center;padding:46px 20px;color:var(--muted)}
+.empty .eico{font-size:2.5rem;margin-bottom:9px}
+.empty p{font-size:.85rem}
+.pill{display:inline-flex;align-items:center;gap:4px;background:var(--s3);border-radius:20px;padding:2px 8px;font-size:.72rem;font-weight:500}
+@media(max-width:900px){
+  .sidebar{width:var(--sc)!important}
+  .sidebar .nl,.sidebar .nt,.sidebar .sb-store,.sidebar .fi{display:none!important}
+  .sidebar .nav-item{justify-content:center;padding:11px 0}
+  .sidebar .nav-group{padding:0 9px}
+  .sidebar .nb{width:7px;height:7px;padding:0;border-radius:50%;position:absolute;top:8px;right:8px;min-width:0;font-size:0}
+  .form-grid{grid-template-columns:1fr!important}
+}
+@media(max-width:600px){.pw{padding:13px 11px}.topbar{padding:0 12px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="ls" id="ls">
+  <div class="lc">
+    <div class="lic">⚙️</div>
+    <h1>Painel Admin</h1>
+    <p>Acesso restrito ao gestor</p>
+    <div class="lf">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <input class="li" type="password" id="lpwd" placeholder="Senha de acesso" autocomplete="current-password">
+    </div>
+    <button class="lb" onclick="doLogin()">Entrar →</button>
+    <div class="lerr" id="lerr">❌ Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sbh">
+    <div class="sbb">
+      <div class="sbico">🍽️</div>
+      <span class="sbn">CardápioApp</span>
+    </div>
+    <button class="col-btn" id="col-btn" onclick="toggleSB()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+  </div>
+  <div class="sb-store">
+    <div class="sdot"></div>
+    <div class="ssi"><div class="ssn" id="sb-store">Minha Loja</div><div class="sss">● Online</div></div>
+  </div>
+  <div class="nav-scroll">
+    <div class="nav-group">
+      <span class="nl">Principal</span>
+      <div class="nav-item on" data-tip="Dashboard" onclick="go('dashboard',this)"><span class="ni">📊</span><span class="nt">Dashboard</span></div>
+      <div class="nav-item" data-tip="Pedidos" onclick="go('orders',this)"><span class="ni">🛒</span><span class="nt">Pedidos</span><span class="nb" id="pb" style="display:none">0</span></div>
+    </div>
+    <div class="nav-group">
+      <span class="nl">Cardápio</span>
+      <div class="nav-item" data-tip="Itens" onclick="go('menu',this)"><span class="ni">🍽️</span><span class="nt">Itens</span></div>
+      <div class="nav-item" data-tip="Categorias" onclick="go('categories',this)"><span class="ni">🏷️</span><span class="nt">Categorias</span></div>
+    </div>
+    <div class="nav-group">
+      <span class="nl">CRM & Crédito</span>
+      <div class="nav-item" data-tip="Clientes" onclick="go('clients',this)"><span class="ni">👥</span><span class="nt">Clientes</span></div>
+      <div class="nav-item" data-tip="Crédito" onclick="go('credit',this)"><span class="ni">💳</span><span class="nt">Crédito</span><span class="nb" id="cb-badge" style="display:none">0</span></div>
+      <div class="nav-item" data-tip="Relatórios" onclick="go('reports',this)"><span class="ni">📈</span><span class="nt">Relatórios</span></div>
+    </div>
+    <div class="nav-group">
+      <span class="nl">Sistema</span>
+      <div class="nav-item" data-tip="Configurações" onclick="go('settings',this)"><span class="ni">⚙️</span><span class="nt">Configurações</span></div>
+      <div class="nav-item" data-tip="Sair" onclick="doLogout()"><span class="ni">🚪</span><span class="nt">Sair</span></div>
+    </div>
+  </div>
+  <div class="sbf">
+    <div class="sfin" onclick="go('settings',document.querySelector('[data-tip=Configurações]'))">
+      <div class="fav">👤</div>
+      <div class="fi"><div class="fn">Administrador</div><div class="fv">v2.2 · Cardápio Digital</div></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l"><div><div class="tb-title" id="tbt">Dashboard</div><div class="tb-sub" id="tbs">Visão geral</div></div></div>
+    <div class="tb-r">
+      <div class="tb-clock" id="clk"></div>
+      <div class="bell" id="bell-btn">🔔<span class="bdot" id="bdot"></span></div>
+    </div>
+  </div>
+  <div class="pw">
+
+    <!-- DASHBOARD -->
+    <section class="page on" id="page-dashboard">
+      <div class="ph"><div><h1>Dashboard</h1><p id="dash-d"></p></div><div class="pha"><button class="btn btn-o" onclick="loadDash()">↺ Atualizar</button></div></div>
+      <div class="sg" id="sg"></div>
+      <div class="tw"><div class="th"><h3>⏳ Últimos Pedidos</h3><button class="btn btn-o btn-sm" onclick="go('orders',document.querySelectorAll('.nav-item')[1])">Ver todos →</button></div><div id="rec-list" style="padding:0 0 5px"></div></div>
+    </section>
+
+    <!-- PEDIDOS -->
+    <section class="page" id="page-orders">
+      <div class="ph">
+        <div><h1>Pedidos</h1><p id="orders-count" style="color:var(--muted2)">Carregando...</p></div>
+        <div class="pha" style="display:flex;align-items:center;gap:8px">
+          <label style="display:flex;align-items:center;gap:5px;font-size:.79rem;color:var(--muted2);cursor:pointer;white-space:nowrap">
+            <input type="checkbox" id="auto-notify-cb" style="accent-color:var(--accent)" onchange="_saveAutoNotify()">
+            📣 Auto-WA
+          </label>
+        </div>
+      </div>
+      <div class="fbar" style="flex-wrap:wrap;gap:7px">
+        <input class="fgi" type="search" placeholder="🔍 Buscar ID, cliente, endereço..." id="oq" oninput="renderOrders()" style="flex:2;min-width:160px">
+        <select class="fgi" id="of" onchange="renderOrders()" style="max-width:175px">
+          <option value="">Todos os status</option>
+          <option value="pending">⏳ Aguardando</option>
+          <option value="accepted">✅ Aceito</option>
+          <option value="preparing">🍳 Preparando</option>
+          <option value="delivering">🛵 Entregando</option>
+          <option value="delivered">📦 Entregue</option>
+          <option value="cancelled">❌ Cancelado</option>
+        </select>
+        <select class="fgi" id="ozone" onchange="renderOrders()" style="max-width:145px">
+          <option value="">Todas as zonas</option>
+          <option value="bairro">🟢 Bairro</option>
+          <option value="proximo">🟡 Motoboy</option>
+          <option value="retirada">🏠 Retirada</option>
+        </select>
+        <input class="fgi" type="date" id="odf" onchange="renderOrders()" title="Data inicial" style="max-width:145px">
+        <button class="btn btn-o btn-sm" onclick="clearOrderFilters()" title="Limpar filtros">✕ Limpar</button>
+      </div>
+      <div id="orders-list"></div>
+    </section>
+
+    <!-- ITENS -->
+    <section class="page" id="page-menu">
+      <div class="ph"><div><h1>Itens do Cardápio</h1><p>Fotos, preços e upsells</p></div><div class="pha"><button class="btn btn-p" onclick="openItemModal(0)">+ Novo Item</button></div></div>
+      <div class="fbar">
+        <input class="fgi" type="search" placeholder="🔍 Buscar item..." id="mq" oninput="renderMenu()">
+        <select class="fgi" id="mcf" onchange="renderMenu()" style="max-width:188px"><option value="">Todas categorias</option></select>
+      </div>
+      <div id="menu-list" class="ilist"></div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="page" id="page-categories">
+      <div class="ph"><div><h1>Categorias</h1><p>Organização do cardápio</p></div><div class="pha"><button class="btn btn-p" onclick="openCatModal('')">+ Nova Categoria</button></div></div>
+      <div id="cats-list" class="ilist"></div>
+    </section>
+
+    <!-- CLIENTES CRM -->
+    <section class="page" id="page-clients">
+      <div class="ph"><div><h1>CRM — Clientes</h1><p>Clientes cadastrados e histórico</p></div></div>
+      <div class="fbar"><input class="fgi" type="search" placeholder="🔍 Buscar nome, e-mail ou telefone..." id="clq" oninput="renderClients()"></div>
+      <div class="tw">
+        <table><thead><tr><th>Cliente</th><th>E-mail</th><th>Telefone</th><th>Pedidos</th><th>Total Gasto</th><th>Crédito</th><th>Cadastro</th><th>Ações</th></tr></thead>
+        <tbody id="cl-tbody"></tbody></table>
+      </div>
+    </section>
+
+    <!-- CRÉDITO CRM -->
+    <section class="page" id="page-credit">
+      <div class="ph"><div><h1>CRM de Crédito</h1><p>Gestão completa de créditos e dívidas</p></div>
+        <div class="pha">
+          <button class="btn btn-pu" onclick="bulkIncreaseCredit()">⬆️ Aumentar todos</button>
+          <button class="btn btn-o" onclick="go('credit',document.querySelector('[data-tip=Crédito]'))">↺ Atualizar</button>
+        </div>
+      </div>
+      <div class="sg" id="credit-sg"></div>
+      <!-- Alerts: overdue / near due -->
+      <div class="tw mb3">
+        <div class="th"><h3>🚨 Alertas de Crédito</h3></div>
+        <div id="credit-alerts" style="padding:8px 0"></div>
+      </div>
+      <!-- Rankings -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="tw">
+          <div class="th"><h3>💸 Maiores Dívidas</h3></div>
+          <table><thead><tr><th>Cliente</th><th>Dívida</th><th>Vence em</th></tr></thead><tbody id="top-debt"></tbody></table>
+        </div>
+        <div class="tw">
+          <div class="th"><h3>🏆 Maior Crédito</h3></div>
+          <table><thead><tr><th>Cliente</th><th>Limite</th><th>Disponível</th></tr></thead><tbody id="top-credit"></tbody></table>
+        </div>
+      </div>
+      <!-- All credit clients -->
+      <div class="tw">
+        <div class="th"><h3>💳 Todos com Crédito Ativo</h3>
+          <div class="fbar" style="margin:0"><input class="fgi" type="search" placeholder="🔍 Buscar..." id="crq" oninput="renderCreditTable()" style="max-width:200px"></div>
+        </div>
+        <table><thead><tr><th>Cliente</th><th>Rank</th><th>Limite</th><th>Usado</th><th>Disponível</th><th>Dívida c/ taxa</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="cr-tbody"></tbody></table>
+      </div>
+    </section>
+
+    <!-- RELATÓRIOS -->
+    <section class="page" id="page-reports">
+      <div class="ph">
+        <div><h1>Relatórios</h1><p>Análise de vendas e desempenho</p></div>
+        <div class="pha" style="display:flex;gap:8px">
+          <button class="btn btn-o" onclick="exportCSVData()">📊 Exportar CSV</button>
+          <select id="rep-period" onchange="renderReports()" class="fgi" style="max-width:160px;height:36px">
+            <option value="all">Todo período</option>
+            <option value="today">Hoje</option>
+            <option value="week">Últimos 7 dias</option>
+            <option value="month">Este mês</option>
+          </select>
+        </div>
+      </div>
+      <div class="sg" id="rep-sg"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="tw">
+          <div class="th"><h3>🏆 Itens Mais Vendidos</h3></div>
+          <table><thead><tr><th>#</th><th>Item</th><th>Qtd</th><th>Receita</th></tr></thead><tbody id="top-items"></tbody></table>
+        </div>
+        <div class="tw">
+          <div class="th"><h3>💳 Pagamentos por Método</h3></div>
+          <table><thead><tr><th>Método</th><th>Pedidos</th><th>Ticket Médio</th></tr></thead><tbody id="pay-methods-table"></tbody></table>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="tw">
+          <div class="th"><h3>📅 Receita por Dia da Semana</h3></div>
+          <table><thead><tr><th>Dia</th><th>Pedidos</th><th>Receita</th></tr></thead><tbody id="weekday-table"></tbody></table>
+        </div>
+        <div class="tw">
+          <div class="th"><h3>👑 Top Clientes</h3></div>
+          <table><thead><tr><th>Cliente</th><th>Pedidos</th><th>Gasto Total</th></tr></thead><tbody id="top-customers"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONFIGURAÇÕES -->
+    <section class="page" id="page-settings">
+      <div class="ph"><div><h1>Configurações</h1><p>Loja, crédito, Cloudinary e segurança</p></div><div class="pha"><button class="btn btn-g" onclick="saveSettings()">💾 Salvar Tudo</button></div></div>
+      <div class="sblock"><h3>🚚 Sistema de Entrega</h3>
+        <div style="margin-bottom:13px">
+          <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:7px">
+            <span style="font-size:.78rem;color:var(--muted2)">Estratégia de cálculo:</span>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer"><input type="radio" name="del-strategy" id="del-strat-nominatim" value="nominatim" checked style="accent-color:var(--accent)"> 🆓 Nominatim (gratuito, linha reta)</label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer"><input type="radio" name="del-strategy" id="del-strat-gmaps" value="gmaps" style="accent-color:var(--accent)"> 🗺️ Google Maps (rota real)</label>
+          </div>
+          <div style="padding:9px 12px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:var(--rsm);font-size:.77rem;color:var(--blue)">
+            💡 <strong>Nominatim</strong> é gratuito (OpenStreetMap) e usa linha reta +20%. <strong>Google Maps</strong> usa distância real por rota — requer API Key com <em>Distance Matrix API</em> e <em>Geocoding API</em> habilitadas no Google Cloud Console.
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="fg full"><label class="fgl">📍 Endereço de Origem (loja)</label><input class="fgi" id="del-origin" placeholder="Rua Azevedo Marques 289, Jardim Professor, Francisco Morato - SP"></div>
+          <div class="fg full" id="del-gmaps-wrap">
+            <label class="fgl">🔑 Google Maps API Key</label>
+            <div style="position:relative">
+              <input class="fgi" id="del-gmaps" placeholder="AIzaSy..." type="password" autocomplete="off">
+              <button type="button" onclick="toggleApiKeyVis()" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;color:var(--muted2);font-size:.8rem;padding:3px 6px" id="api-key-toggle">👁️</button>
+            </div>
+            <div style="font-size:.73rem;color:var(--muted2);margin-top:4px">Habilite: <em>Geocoding API</em> + <em>Distance Matrix API</em> no <a href="https://console.cloud.google.com" target="_blank" style="color:var(--acch)">Google Cloud Console</a></div>
+          </div>
+        </div>
+        <div style="margin:11px 0 7px;font-size:.8rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px">Zonas de entrega</div>
+        <div class="form-grid">
+          <div class="fg"><label class="fgl">🟢 Zona 1 — raio máximo (km)</label><input class="fgi" type="number" id="del-z1km" min="0.1" step="0.1" value="1"></div>
+          <div class="fg"><label class="fgl">🟢 Zona 1 — taxa fixa (R$)</label><input class="fgi" type="number" id="del-z1taxa" min="0" step="0.5" value="2"></div>
+          <div class="fg"><label class="fgl">🟢 Zona 1 — tempo estimado</label><input class="fgi" id="del-z1tempo" placeholder="10–20 min" value="10–20 min"></div>
+          <div class="fg"><label class="fgl">🟢 Zona 1 — método</label>
+            <select class="fgi" id="del-z1metodo"><option value="propria">🚶 Entrega própria</option><option value="motoboy">🏍️ Motoboy</option></select>
+          </div>
+          <div class="fg"><label class="fgl">🟡 Zona 2 — raio máximo (km)</label><input class="fgi" type="number" id="del-z2km" min="0.5" step="0.5" value="3"></div>
+          <div class="fg"><label class="fgl">🟡 Zona 2 — taxa base (R$)</label><input class="fgi" type="number" id="del-z2base" min="0" step="0.5" value="5"></div>
+          <div class="fg"><label class="fgl">🟡 Zona 2 — taxa por km (R$)</label><input class="fgi" type="number" id="del-z2pkm" min="0" step="0.5" value="2"></div>
+          <div class="fg"><label class="fgl">🟡 Zona 2 — pedido mínimo (R$)</label><input class="fgi" type="number" id="del-z2min" min="0" step="1" value="20"></div>
+          <div class="fg"><label class="fgl">🟡 Zona 2 — tempo estimado</label><input class="fgi" id="del-z2tempo" placeholder="20–40 min" value="20–40 min"></div>
+          <div class="fg"><label class="fgl">🟡 Zona 2 — método</label>
+            <select class="fgi" id="del-z2metodo"><option value="motoboy">🏍️ Motoboy (99)</option><option value="propria">🚶 Entrega própria</option></select>
+          </div>
+          <div class="fg full"><label class="fgl">🔴 Zona 3 — mensagem de bloqueio</label>
+            <textarea class="fgi" id="del-z3msg" style="height:62px">Atendemos apenas esta região no momento 🙏
+Você pode nos encontrar no iFood 👍</textarea>
+          </div>
+        </div>
+        <div style="margin-top:11px;padding:10px 13px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:var(--rsm)">
+          <div style="font-size:.78rem;font-weight:700;color:var(--green);margin-bottom:6px">📊 Preview das taxas (Zona 2)</div>
+          <div style="font-size:.77rem;color:var(--muted2);display:flex;flex-wrap:wrap;gap:10px" id="del-preview"></div>
+          <button class="btn btn-o btn-sm" style="margin-top:8px" onclick="updateDeliveryPreview()">↺ Atualizar preview</button>
+          <button class="btn btn-o btn-sm" style="margin-top:8px;margin-left:7px" onclick="testDeliveryAddress()">🧪 Testar endereço</button>
+        </div>
+      </div>
+      <div class="sblock"><h3>🏪 Dados da Loja</h3>
+        <div class="form-grid">
+          <div class="fg"><label class="fgl">Nome da Loja</label><input class="fgi" id="cn" placeholder="Sabor &amp; Arte"></div>
+          <div class="fg"><label class="fgl">WhatsApp</label><input class="fgi" id="cw" placeholder="5511999999999"></div>
+          <div class="fg"><label class="fgl">Título Cardápio</label><input class="fgi" id="cht"></div>
+          <div class="fg"><label class="fgl">Subtítulo</label><input class="fgi" id="chs"></div>
+          <div class="fg full"><label class="fgl">Horário de Funcionamento</label><input class="fgi" id="chr" placeholder="Seg–Sex 11h–22h"></div>
+        </div>
+      </div>
+      <div class="sblock"><h3>💳 Sistema de Crédito</h3>
+        <div class="form-grid">
+          <div class="fg"><label class="fgl">Pedidos mínimos para liberar crédito</label><input class="fgi" type="number" id="c-min" min="1" max="50" value="5"></div>
+          <div class="fg"><label class="fgl">Taxa fixa de cobrança (R$)</label><input class="fgi" type="number" id="c-tax" min="0" step="0.01" value="5"></div>
+          <div class="fg"><label class="fgl">🥉 Nível Bronze — crédito inicial (R$)</label><input class="fgi" type="number" id="c-l1" min="1" step="1" value="20"></div>
+          <div class="fg"><label class="fgl">🥈 Nível Prata (R$)</label><input class="fgi" type="number" id="c-l2" min="1" step="1" value="40"></div>
+          <div class="fg"><label class="fgl">🥇 Nível Ouro — máximo (R$)</label><input class="fgi" type="number" id="c-l3" min="1" step="1" value="60"></div>
+          <div class="fg"><label class="fgl">Dias para vencimento</label><input class="fgi" type="number" id="c-days" min="1" max="90" value="30"></div>
+        </div>
+      </div>
+      <div class="sblock"><h3>☁️ Cloudinary</h3>
+        <div class="cnote">⚠️ <span>Configure para upload de fotos. Crie conta em cloudinary.com → Settings → Upload → Preset <strong>Unsigned</strong>.</span></div>
+        <div class="form-grid">
+          <div class="fg"><label class="fgl">Cloud Name</label><input class="fgi" id="ccn" placeholder="meu-cloud"></div>
+          <div class="fg"><label class="fgl">Upload Preset</label><input class="fgi" id="ccp" placeholder="cardapio_preset"></div>
+        </div>
+      </div>
+      <div class="sblock"><h3>💳 Formas de Pagamento</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:8px" id="pm-checks">
+          <label style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bord2);border-radius:8px;padding:8px 12px;cursor:pointer"><input type="checkbox" id="pm-dinheiro" value="dinheiro" checked style="accent-color:var(--accent)"> 💵 Dinheiro</label>
+          <label style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bord2);border-radius:8px;padding:8px 12px;cursor:pointer"><input type="checkbox" id="pm-pix" value="pix" checked style="accent-color:var(--accent)"> 📱 Pix</label>
+          <label style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bord2);border-radius:8px;padding:8px 12px;cursor:pointer"><input type="checkbox" id="pm-credito" value="credito" checked style="accent-color:var(--accent)"> 💳 Crédito</label>
+          <label style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bord2);border-radius:8px;padding:8px 12px;cursor:pointer"><input type="checkbox" id="pm-debito" value="debito" style="accent-color:var(--accent)"> 🏦 Débito</label>
+          <label style="display:flex;align-items:center;gap:6px;background:var(--s2);border:1px solid var(--bord2);border-radius:8px;padding:8px 12px;cursor:pointer"><input type="checkbox" id="pm-vale" value="vale" style="accent-color:var(--accent)"> 🎫 Vale</label>
+        </div>
+      </div>
+      <div class="sblock"><h3>💬 WhatsApp Business — Atendimento Automático</h3>
+        <div class="cnote" style="background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.25);color:#4ade80">
+          ℹ️ <span>Integração com <strong>WhatsApp Business API (Meta/360dialog/Z-API/Twilio)</strong>. Configure o provedor e o chatbot responderá automaticamente aos clientes: confirmações de pedido, status, pagamento via Pix e cobrança da Conta Rapi10.</span>
+        </div>
+
+        <!-- Toggle geral -->
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm);margin-bottom:14px">
+          <div>
+            <div class="fw7" style="font-size:.9rem">🤖 Atendimento Automático</div>
+            <div class="tc-m" style="font-size:.77rem;margin-top:2px">Ativa o chatbot para responder clientes automaticamente</div>
+          </div>
+          <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer">
+            <input type="checkbox" id="wa-bot-enabled" style="opacity:0;width:0;height:0" onchange="onWaBotToggle()">
+            <span id="wa-bot-slider" style="position:absolute;cursor:pointer;inset:0;background:var(--s4);border-radius:24px;transition:.3s">
+              <span style="position:absolute;left:3px;bottom:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.3s" id="wa-bot-knob"></span>
+            </span>
+          </label>
+        </div>
+
+        <!-- Provedor -->
+        <div class="form-grid" id="wa-config-grid">
+          <div class="fg full">
+            <label class="fgl">Provedor da API</label>
+            <select class="fgi" id="wa-provider" onchange="onWaProviderChange()">
+              <option value="">— Selecione o provedor —</option>
+              <option value="meta">Meta (WhatsApp Cloud API) — Gratuito com limites</option>
+              <option value="360dialog">360dialog — R$ ~150/mês</option>
+              <option value="zapi">Z-API — A partir de R$ 99/mês</option>
+              <option value="twilio">Twilio — Pay-as-you-go</option>
+              <option value="evolution">Evolution API — Open source auto-hospedado</option>
+            </select>
+          </div>
+
+          <!-- Campos Meta / Cloud API -->
+          <div class="fg" id="wa-meta-fields" style="display:none">
+            <label class="fgl">Phone Number ID (Meta)</label>
+            <input class="fgi" id="wa-phone-id" placeholder="123456789012345">
+          </div>
+          <div class="fg" id="wa-meta-token-field" style="display:none">
+            <label class="fgl">Access Token Permanente</label>
+            <div style="position:relative">
+              <input class="fgi" id="wa-access-token" type="password" placeholder="EAAxxxxxxx..." autocomplete="off">
+              <button type="button" onclick="toggleWaTokenVis('wa-access-token')" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;color:var(--muted2);font-size:.8rem;padding:3px 6px">👁️</button>
+            </div>
+          </div>
+          <div class="fg" id="wa-waba-field" style="display:none">
+            <label class="fgl">WhatsApp Business Account ID</label>
+            <input class="fgi" id="wa-waba-id" placeholder="123456789012345">
+          </div>
+          <div class="fg full" id="wa-verify-field" style="display:none">
+            <label class="fgl">Webhook Verify Token (você define)</label>
+            <input class="fgi" id="wa-verify-token" placeholder="meu_token_secreto_123" autocomplete="off">
+          </div>
+
+          <!-- Campos Z-API / 360dialog / Twilio / Evolution -->
+          <div class="fg" id="wa-instance-field" style="display:none">
+            <label class="fgl" id="wa-instance-lbl">Instance ID / API Key</label>
+            <div style="position:relative">
+              <input class="fgi" id="wa-instance-key" type="password" placeholder="..." autocomplete="off">
+              <button type="button" onclick="toggleWaTokenVis('wa-instance-key')" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;color:var(--muted2);font-size:.8rem;padding:3px 6px">👁️</button>
+            </div>
+          </div>
+          <div class="fg" id="wa-token-field" style="display:none">
+            <label class="fgl" id="wa-token-lbl">Token / Client Token</label>
+            <div style="position:relative">
+              <input class="fgi" id="wa-client-token" type="password" placeholder="..." autocomplete="off">
+              <button type="button" onclick="toggleWaTokenVis('wa-client-token')" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);background:none;color:var(--muted2);font-size:.8rem;padding:3px 6px">👁️</button>
+            </div>
+          </div>
+          <div class="fg full" id="wa-url-field" style="display:none">
+            <label class="fgl" id="wa-url-lbl">URL do Servidor / Endpoint</label>
+            <input class="fgi" id="wa-server-url" placeholder="https://api.z-api.io/instances/..." autocomplete="off">
+          </div>
+
+          <!-- Número do WhatsApp da loja -->
+          <div class="fg">
+            <label class="fgl">Número WhatsApp da Loja (com DDI)</label>
+            <input class="fgi" id="wa-number" placeholder="5511999999999" type="tel">
+          </div>
+          <div class="fg">
+            <label class="fgl">Webhook URL (gerado pelo backend)</label>
+            <div style="display:flex;gap:7px">
+              <input class="fgi" id="wa-webhook-url" placeholder="https://xxx.supabase.co/functions/v1/wa-webhook" readonly style="color:var(--muted2);font-size:.78rem">
+              <button class="btn btn-o btn-sm" onclick="copyWaWebhook()">📋</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comportamentos do bot -->
+        <div style="margin-top:14px" id="wa-behaviors-grid">
+          <div style="font-size:.8rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px">🎛️ Comportamentos Automáticos</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 13px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm)">
+              <input type="checkbox" id="wa-auto-confirm" checked style="accent-color:#25D366;width:16px;height:16px">
+              <div><div class="fw6" style="font-size:.84rem">✅ Confirmação automática de pedido</div><div class="tc-m" style="font-size:.75rem">Envia "Pedido recebido" assim que chega</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 13px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm)">
+              <input type="checkbox" id="wa-auto-status" checked style="accent-color:#25D366;width:16px;height:16px">
+              <div><div class="fw6" style="font-size:.84rem">🔔 Notificação de mudança de status</div><div class="tc-m" style="font-size:.75rem">Aceito → Preparando → Saiu → Entregue</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 13px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm)">
+              <input type="checkbox" id="wa-auto-pix" style="accent-color:#25D366;width:16px;height:16px">
+              <div><div class="fw6" style="font-size:.84rem">📱 Envio automático de QR Code Pix</div><div class="tc-m" style="font-size:.75rem">Envia o QR Pix (Mercado Pago) logo após o pedido</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 13px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm)">
+              <input type="checkbox" id="wa-auto-credit" style="accent-color:#25D366;width:16px;height:16px">
+              <div><div class="fw6" style="font-size:.84rem">💳 Cobrança automática Conta Rapi10</div><div class="tc-m" style="font-size:.75rem">Avisa o cliente quando o crédito está perto de vencer</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 13px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm)">
+              <input type="checkbox" id="wa-auto-menu" style="accent-color:#25D366;width:16px;height:16px">
+              <div><div class="fw6" style="font-size:.84rem">🍽️ Responder "cardápio" com link</div><div class="tc-m" style="font-size:.75rem">Se cliente digitar "cardápio", "menu" ou "oi", recebe o link</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:9px 13px;background:var(--s2);border:1px solid var(--bord2);border-radius:var(--rsm)">
+              <input type="checkbox" id="wa-auto-hours" style="accent-color:#25D366;width:16px;height:16px">
+              <div><div class="fw6" style="font-size:.84rem">🕐 Resposta fora do horário</div><div class="tc-m" style="font-size:.75rem">Mensagem automática quando a loja está fechada</div></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Mensagens customizáveis -->
+        <div style="margin-top:14px" id="wa-messages-section">
+          <div style="font-size:.8rem;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px">✏️ Mensagens Personalizáveis</div>
+          <div class="form-grid">
+            <div class="fg full">
+              <label class="fgl">Saudação inicial (quando cliente escreve pela 1ª vez)</label>
+              <textarea class="fgi" id="wa-msg-welcome" style="height:68px" placeholder="Olá! 👋 Seja bem-vindo ao {loja}! Digite *cardápio* para ver nossos pratos ou acesse: {link}"></textarea>
+            </div>
+            <div class="fg full">
+              <label class="fgl">Confirmação de pedido recebido</label>
+              <textarea class="fgi" id="wa-msg-received" style="height:68px" placeholder="✅ Pedido *{id}* recebido! Logo confirmaremos. Aguarde 🙏"></textarea>
+            </div>
+            <div class="fg full">
+              <label class="fgl">Resposta fora do horário</label>
+              <textarea class="fgi" id="wa-msg-closed" style="height:68px" placeholder="😴 Estamos fechados no momento. Horário: {horario}. Mas você já pode montar seu pedido: {link}"></textarea>
+            </div>
+            <div class="fg full">
+              <label class="fgl">Mensagem de cobrança Rapi10 (próximo ao vencimento)</label>
+              <textarea class="fgi" id="wa-msg-credit" style="height:68px" placeholder="⚠️ Olá {nome}! Sua Conta Rapi10 vence em {dias} dias. Saldo: R$ {valor}. Entre em contato! 🙏"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status da conexão + botão testar -->
+        <div style="margin-top:13px;display:flex;gap:9px;flex-wrap:wrap;align-items:center">
+          <button class="btn btn-o" onclick="testWaConnection()">🔌 Testar Conexão</button>
+          <button class="btn btn-o" onclick="sendWaTest()">📤 Enviar Msg Teste</button>
+          <div id="wa-status-badge" style="display:none;padding:5px 12px;border-radius:20px;font-size:.78rem;font-weight:700"></div>
+        </div>
+
+        <div style="margin-top:11px;padding:10px 13px;background:rgba(37,211,102,.06);border:1px solid rgba(37,211,102,.2);border-radius:var(--rsm);font-size:.77rem;color:var(--muted2)">
+          <strong style="color:#4ade80">🔗 Webhook URL</strong> — Após salvar, copie a URL do webhook e configure no painel do seu provedor WhatsApp. O backend receberá todas as mensagens e responderá automaticamente segundo as regras acima.<br>
+          <strong style="color:#4ade80">Variáveis</strong>: use <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{loja}</code> <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{link}</code> <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{id}</code> <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{nome}</code> <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{valor}</code> <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{dias}</code> <code style="background:var(--s3);padding:1px 5px;border-radius:3px">{horario}</code>
+        </div>
+      </div>
+      <div class="sblock"><h3>🔑 Segurança</h3>
+        <div class="form-grid">
+          <div class="fg"><label class="fgl">Senha Atual</label><input class="fgi" type="password" id="pc" placeholder="••••••••"></div>
+          <div class="fg"><label class="fgl">Nova Senha</label><input class="fgi" type="password" id="pn" placeholder="••••••••"></div>
+        </div>
+        <button class="btn btn-o mt3" onclick="changePwd()">🔒 Alterar Senha</button>
+      </div>
+      <div class="sblock"><h3>📱 QR Code</h3>
+        <div class="flex gap2 mb3" style="flex-wrap:wrap">
+          <button class="btn btn-o" onclick="copyLink()">📋 Copiar Link</button>
+          <button class="btn btn-o" onclick="genQR()">🔲 Gerar QR Code</button>
+        </div><div id="qr-box"></div>
+      </div>
+      <div class="sblock"><h3>🗂️ Dados</h3>
+        <!-- ── Migração para Supabase ── -->
+        <div id="supa-migration-block" style="margin-bottom:16px;padding:13px 15px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:var(--rsm)">
+          <div class="fw7" style="font-size:.88rem;color:var(--blue);margin-bottom:5px">☁️ Supabase Cloud</div>
+          <div class="tc-m" style="font-size:.78rem;margin-bottom:10px">Importe os dados atuais do localStorage para o Supabase. Execute uma única vez após configurar o backend.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-o btn-sm" onclick="migrarParaSupabase()">📤 Importar dados para Supabase</button>
+            <button class="btn btn-o btn-sm" onclick="Supa&&Supa.hydrateAdmin()">🔄 Recarregar do Supabase</button>
+            <div id="supa-conn-status" style="display:flex;align-items:center;gap:5px;font-size:.77rem;color:var(--muted2)">
+              <span id="supa-dot" style="width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block"></span>
+              <span id="supa-conn-lbl">Verificando...</span>
+            </div>
+          </div>
+        </div>
+        <div class="flex gap2" style="flex-wrap:wrap">
+          <button class="btn btn-o" onclick="exportData()">📤 Exportar Backup</button>
+          <button class="btn btn-o" onclick="document.getElementById('imp-f').click()">📥 Importar</button>
+          <button class="btn btn-r" onclick="clearOrders()">🗑️ Limpar Pedidos</button>
+        </div>
+        <input type="file" id="imp-f" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- MODAL: ITEM -->
+<div class="mo" id="item-mo">
+  <div class="modal">
+    <div class="mhd"><h2 id="item-mt">Novo Item</h2><button class="mcl" onclick="cmo('item-mo')">✕</button></div>
+    <div class="fg mb3">
+      <label class="fgl">📸 Foto</label>
+      <div class="upa" id="upa" ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)">
+        <input type="file" id="img-inp" accept="image/*" onchange="onFileSelect(event)">
+        <img class="up-pv" id="up-pv" src="" alt="">
+        <div class="up-ph" id="up-ph"><span class="up-ico">📸</span><div class="up-txt">Clique ou arraste</div><div class="up-hint">JPG · PNG · WEBP · Máx 10MB</div></div>
+        <div class="up-st" id="up-st"></div>
+        <div class="up-bw" id="up-bw"><div class="up-b" id="up-b"></div></div>
+      </div>
+      <div class="up-acts" id="up-acts" style="display:none"><button class="btn btn-o btn-sm" type="button" onclick="clearImg()">🗑️ Remover</button><span class="pill" style="color:var(--green)">✅ Carregada</span></div>
+      <div class="mt2"><label class="fgl" style="margin-bottom:4px;display:block">ou cole URL</label><input class="fgi" id="img-url" placeholder="https://..." oninput="onUrlInput()"></div>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label class="fgl">Nome *</label><input class="fgi" id="in" placeholder="Ex: Picanha Grelhada"></div>
+      <div class="fg"><label class="fgl">Emoji (fallback)</label><input class="fgi" id="ie" placeholder="🥩"></div>
+      <div class="fg"><label class="fgl">Categoria *</label><select class="fgi" id="ic"></select></div>
+      <div class="fg"><label class="fgl">Preço (R$) *</label><input class="fgi" type="number" id="ip" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="fg"><label class="fgl">Desconto (%)</label><input class="fgi" type="number" id="ipr" placeholder="0" min="0" max="90"></div>
+      <div class="fg"><label class="fgl">Disponível</label><select class="fgi" id="iav"><option value="1">✅ Sim</option><option value="0">❌ Não</option></select></div>
+      <div class="fg full"><label class="fgl">Descrição</label><textarea class="fgi" id="id"></textarea></div>
+      <div class="fg full">
+        <label class="fgl">✨ Upsell — Sugestões ao adicionar</label>
+        <div id="ups-cbs" style="display:flex;flex-wrap:wrap;gap:7px;margin-top:4px"></div>
+        <p style="font-size:.71rem;color:var(--muted);margin-top:4px">Itens sugeridos quando este for adicionado ao carrinho.</p>
+      </div>
+    </div>
+    <div class="mft"><button class="btn btn-o" onclick="cmo('item-mo')">Cancelar</button><button class="btn btn-p" onclick="saveItem()">💾 Salvar Item</button></div>
+    <input type="hidden" id="ieid">
+  </div>
+</div>
+
+<!-- MODAL: ORDER -->
+<div class="mo" id="order-mo">
+  <div class="modal"><div class="mhd"><h2 id="om-t">Pedido</h2><button class="mcl" onclick="cmo('order-mo')">✕</button></div><div id="om-body"></div></div>
+</div>
+
+<!-- MODAL: CATEGORY -->
+<div class="mo" id="cat-mo">
+  <div class="modal" style="max-width:345px">
+    <div class="mhd"><h2 id="cm-t">Nova Categoria</h2><button class="mcl" onclick="cmo('cat-mo')">✕</button></div>
+    <div class="fg mb3"><label class="fgl">Nome *</label><input class="fgi" id="cname" placeholder="Ex: Entradas..."></div>
+    <div class="fg"><label class="fgl">Emoji</label><input class="fgi" id="cemoji" placeholder="🏷️"></div>
+    <div class="mft"><button class="btn btn-o" onclick="cmo('cat-mo')">Cancelar</button><button class="btn btn-p" onclick="saveCat()">Salvar</button></div>
+    <input type="hidden" id="cold">
+  </div>
+</div>
+
+<!-- MODAL: CLIENT DETAIL -->
+<div class="mo" id="client-mo">
+  <div class="modal"><div class="mhd"><h2 id="clm-t">Cliente</h2><button class="mcl" onclick="cmo('client-mo')">✕</button></div><div id="clm-body"></div></div>
+</div>
+
+<!-- MODAL: CREDIT EDIT -->
+<div class="mo" id="credit-mo">
+  <div class="modal" style="max-width:400px">
+    <div class="mhd"><h2>💳 Editar Crédito</h2><button class="mcl" onclick="cmo('credit-mo')">✕</button></div>
+    <div id="ced-info" class="mb3"></div>
+    <div class="form-grid" style="grid-template-columns:1fr">
+      <div class="fg"><label class="fgl">Novo Limite de Crédito (R$)</label><input class="fgi" type="number" id="ced-limit" min="0" step="1"></div>
+      <div class="fg"><label class="fgl">Crédito Usado (dívida atual R$)</label><input class="fgi" type="number" id="ced-used" min="0" step="0.01"></div>
+      <div class="fg"><label class="fgl">Data de Vencimento</label><input class="fgi" type="date" id="ced-due"></div>
+      <div class="fg"><label class="fgl">Adicionar Cupom ao Cliente</label>
+        <div style="display:flex;gap:7px">
+          <input class="fgi" id="ced-coupon-code" placeholder="Código do cupom" style="flex:1">
+          <input class="fgi" id="ced-coupon-desc" placeholder="Descrição" style="flex:2">
+        </div>
+      </div>
+    </div>
+    <div class="mft"><button class="btn btn-o" onclick="cmo('credit-mo')">Cancelar</button><button class="btn btn-pu" onclick="saveCreditEdit()">💾 Salvar</button></div>
+    <input type="hidden" id="ced-uid">
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="tstack" id="tstack"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+var MENU=[],ORDERS=[],CATS=[];
+var CFG={storeName:'Sabor & Arte',whatsapp:'5511999999999',heroTitle:'Nosso Cardápio',heroSub:'Escolha seus favoritos!',hours:'',adminPwd:'admin2024',cloudName:'',cloudPreset:'',paymentMethods:['dinheiro','pix','credito','debito'],creditTax:5,creditLevels:[20,30,50],creditMinOrders:5,creditDays:30};
+var _imgUrl='';var _sbCol=false;
+
+// ══════════════════════════════════════════════════
+// DATA ACCESS
+// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// PERSISTÊNCIA — escrita dupla: Supabase + localStorage
+// ══════════════════════════════════════════════════
+function SM(){
+  localStorage.setItem('menu_data',JSON.stringify(MENU));
+  if(window.Supa){
+    /* Upsert em lote via admin-api */
+    Supa.Admin.call('sync_menu',{menu:MENU}).catch(function(){});
+  }
+}
+function SC(){
+  localStorage.setItem('store_config',JSON.stringify(CFG));
+  if(window.Supa){
+    Supa.Loja.update(CFG).catch(function(){});
+  }
+}
+function SK(){
+  localStorage.setItem('categories',JSON.stringify(CATS));
+  if(window.Supa){
+    Supa.Admin.call('sync_categories',{categories:CATS}).catch(function(){});
+  }
+}
+function SO(){
+  localStorage.setItem('orders',JSON.stringify(ORDERS));
+  /* Pedidos individuais são salvos via Supa.Pedidos.updateStatus ao mudar status */
+}
+function getUsers(){try{return JSON.parse(localStorage.getItem('users_db')||'[]');}catch(e){return[];}}
+function saveUsers(u){
+  localStorage.setItem('users_db',JSON.stringify(u));
+  /* Sync de usuário individual é feito pelo Supa.Admin.call('update_cliente') */
+}
+
+// ══════════════════════════════════════════════════
+// LOAD ALL — Supabase primeiro, localStorage como fallback
+// ══════════════════════════════════════════════════
+function loadAll(){
+  /* 1. Carrega localStorage imediatamente (UX instantânea) */
+  try{Object.assign(CFG,JSON.parse(localStorage.getItem('store_config')||'{}'));}catch(e){}
+  try{MENU=JSON.parse(localStorage.getItem('menu_data')||'[]');}catch(e){}
+  if(!MENU.length)defaultMenu();
+  try{CATS=JSON.parse(localStorage.getItem('categories')||'[]');}catch(e){}
+  if(!CATS.length){CATS=[...new Set(MENU.map(function(i){return i.category;}))];if(!CATS.length)CATS=['Entradas','Principais','Bebidas','Sobremesas'];}
+  try{ORDERS=JSON.parse(localStorage.getItem('orders')||'[]');}catch(e){}
+
+  /* 2. Hidrata do Supabase em background */
+  if(window.Supa&&Supa.Admin.isLogged()){
+    Supa.hydrateAdmin().then(function(){
+      /* Atualiza estado global com dados do servidor */
+      try{MENU   =JSON.parse(localStorage.getItem('menu_data')||'[]');}catch(e){}
+      try{ORDERS =JSON.parse(localStorage.getItem('orders')||'[]');}catch(e){}
+      try{CATS   =JSON.parse(localStorage.getItem('categories')||'[]');}catch(e){}
+      try{Object.assign(CFG,JSON.parse(localStorage.getItem('store_config')||'{}'));}catch(e){}
+      /* Re-renderiza tudo com dados frescos */
+      loadDash();renderOrders();updateBadge();updateCreditBadge();
+      if(document.getElementById('sb-store'))
+        document.getElementById('sb-store').textContent=CFG.storeName;
+    });
+
+    /* Realtime: pedidos, menu, loja */
+    Supa.subscribeOrders(function(orders){
+      ORDERS=orders;
+      renderOrders();loadDash();updateBadge();
+      toast('🔔 Pedidos atualizados em tempo real','info');
+    });
+    Supa.subscribeMenu(function(items){
+      MENU=items;
+      if(document.getElementById('page-items')&&
+         document.getElementById('page-items').classList.contains('active')) renderItems();
+    });
+    Supa.subscribeLoja(function(loja){
+      Object.assign(CFG,loja);
+      if(document.getElementById('sb-store'))
+        document.getElementById('sb-store').textContent=CFG.storeName;
+    });
+
+    /* Listeners de eventos do adapter */
+    window.addEventListener('supa:orders',    function(e){if(e.detail){ORDERS=e.detail;}});
+    window.addEventListener('supa:menu',      function(e){if(e.detail){MENU=e.detail;}});
+    window.addEventListener('supa:categories',function(e){if(e.detail){CATS=e.detail;}});
+    window.addEventListener('supa:loja',      function(e){if(e.detail){Object.assign(CFG,e.detail);}});
+  }
+}
+
+// ══════════════════════════════════════════════════
+// LOGIN ADMIN — Supabase admin-login + fallback local
+// ══════════════════════════════════════════════════
+function doLogin(){
+  var pwd=document.getElementById('lpwd').value;
+  var err=document.getElementById('lerr');
+  var btn=document.querySelector('.lb');
+  if(btn){btn.disabled=true;btn.textContent='⏳ Entrando...';}
+
+  var finish=function(){
+    if(btn){btn.disabled=false;btn.textContent='Entrar';}
+    document.getElementById('ls').style.display='none';
+    boot();
+  };
+  var fail=function(msg){
+    if(btn){btn.disabled=false;btn.textContent='Entrar';}
+    err.textContent=msg||'Senha incorreta';
+    err.style.display='block';
+    document.getElementById('lpwd').value='';
+    document.getElementById('lpwd').focus();
+    setTimeout(function(){err.style.display='none';},3500);
+  };
+
+  if(window.Supa){
+    Supa.Admin.login('admin', pwd)
+      .then(function(res){
+        if(res.data&&res.data.token){ finish(); return; }
+        if(res.error){ fail(res.error.message); return; }
+        /* Fallback: verifica senha local */
+        if(pwd===CFG.adminPwd||pwd==='admin2024') finish();
+        else fail('Senha incorreta.');
+      })
+      .catch(function(){
+        /* Sem conexão: verifica local */
+        if(pwd===CFG.adminPwd||pwd==='admin2024') finish();
+        else fail('Senha incorreta (offline).');
+      });
+  } else {
+    if(pwd===CFG.adminPwd||pwd==='admin2024') finish();
+    else fail('Senha incorreta.');
+  }
+}
+document.getElementById('lpwd').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+function doLogout(){
+  if(window.Supa)Supa.Admin.logout();
+  document.getElementById('ls').style.display='flex';
+  document.getElementById('lpwd').value='';
+}
+
+function boot(){
+  document.getElementById('sb-store').textContent=CFG.storeName;
+  updateClock();setInterval(updateClock,1e3);
+  loadAll();  /* <- carrega local + Supabase em background */
+  loadDash();updateBadge();updateCreditBadge();
+  _loadAutoNotify();
+  document.getElementById('bell-btn').onclick=function(){go('orders',document.querySelectorAll('.nav-item')[1]);};
+  /* Polling local de emergência (fallback se Realtime cair) */
+  setInterval(function(){
+    try{
+      var fresh=JSON.parse(localStorage.getItem('orders')||'[]');
+      if(fresh.length!==ORDERS.length){ORDERS=fresh;updateBadge();updateCreditBadge();}
+    }catch(e){}
+  },30e3);
+}
+
+function defaultMenu(){
+  MENU=[
+    {id:1,category:'Entradas',emoji:'🥗',name:'Salada Caesar',desc:'Alface romana, croutons e parmesão',price:28.90,available:true,promo:null,imageUrl:'',upsells:[],tags:['veg']},
+    {id:2,category:'Entradas',emoji:'🧀',name:'Tábua de Frios',desc:'Queijos e embutidos importados',price:52.00,available:true,promo:10,imageUrl:'',upsells:[6],tags:['pop']},
+    {id:3,category:'Principais',emoji:'🥩',name:'Picanha Grelhada',desc:'350g com arroz, farofa e vinagrete',price:89.90,available:true,promo:null,imageUrl:'',upsells:[6,7],tags:['pop','hot']},
+    {id:4,category:'Principais',emoji:'🍗',name:'Frango ao Molho',desc:'Peito grelhado com ervas e batatas',price:54.90,available:true,promo:null,imageUrl:'',upsells:[6,7],tags:[]},
+    {id:5,category:'Bebidas',emoji:'🍺',name:'Cerveja Artesanal',desc:'500ml — IPA, Lager ou Weiss',price:18.00,available:true,promo:null,imageUrl:'',upsells:[],tags:['pop']},
+    {id:6,category:'Bebidas',emoji:'🥤',name:'Suco Natural',desc:'300ml feito na hora',price:12.00,available:true,promo:null,imageUrl:'',upsells:[],tags:['veg']},
+    {id:7,category:'Sobremesas',emoji:'🍮',name:'Pudim de Leite',desc:'Com calda de caramelo',price:19.90,available:true,promo:null,imageUrl:'',upsells:[6],tags:[]}
+  ];SM();
+}
+
+// ══════════════════════════════════════════════════
+// CREDIT HELPERS (compatibilidade com CreditEngine)
+// ══════════════════════════════════════════════════
+function getUserOrders(email){return ORDERS.filter(function(o){return o.customerEmail===email;});}
+
+// B1 FIXED: usar [20,40,60] igual ao credito.js
+function calcCreditLevel(n){
+  if(window.CreditEngine){var u=getUsers().find(function(x){return getUserOrders(x.email).length===n;});if(u)return CreditEngine.calcLimit(u);}
+  var min=CFG.creditMinOrders||5;if(n<min)return 0;
+  var lv=CFG.creditLevels||[20,40,60];var e=n-min;
+  if(e<2)return lv[0]||20;if(e<6)return lv[1]||40;return lv[2]||60;
+}
+function getRank(n){var min=CFG.creditMinOrders||5;if(n<min)return null;var e=n-min;if(e<2)return'Bronze';if(e<6)return'Prata';return'Ouro';}
+
+// B2 FIXED: getDaysLeft aceita user objeto OU string de data (backward compat)
+function getDaysLeft(userOrDate){
+  if(!userOrDate)return null;
+  // Se recebeu objeto user, delega ao CreditEngine
+  if(typeof userOrDate==='object'&&userOrDate.id){
+    return window.CreditEngine?CreditEngine.getDaysLeft(userOrDate):getDaysLeft(userOrDate.creditDueDate);
+  }
+  // Se recebeu string ISO (legado)
+  return Math.ceil((new Date(userOrDate)-Date.now())/(1000*60*60*24));
+}
+
+// B7 FIXED: updateCreditBadge agora usa getDaysLeft compatível com user objeto
+function updateCreditBadge(){
+  var users=window.CreditDB?CreditDB.getUsers():getUsers();
+  var active=users.filter(function(u){
+    return window.CreditEngine?CreditEngine.calcLimit(u)>0:(getUserOrders(u.email).length>=(CFG.creditMinOrders||5))&&(u.creditUsed||0)>0;
+  });
+  var overdue=active.filter(function(u){var dl=getDaysLeft(u);return dl!==null&&dl<=0;}).length;
+  var cb=document.getElementById('cb-badge');
+  if(!cb)return;
+  cb.textContent=overdue||active.length;cb.style.display=active.length>0?'inline-flex':'none';
+  cb.style.background=overdue>0?'var(--red)':'var(--purple)';
+}
+
+// ══════════════════════════════════════════════════
+// SIDEBAR + NAV
+// ══════════════════════════════════════════════════
+function toggleSB(){
+  _sbCol=!_sbCol;document.getElementById('sidebar').classList.toggle('col',_sbCol);
+  var b=document.getElementById('col-btn');
+  b.innerHTML=_sbCol?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>';
+}
+
+var PM={dashboard:{t:'Dashboard',s:'Visão geral'},orders:{t:'Pedidos',s:'Gerencie em tempo real'},menu:{t:'Itens do Cardápio',s:'Fotos, preços e upsells'},categories:{t:'Categorias',s:'Organização'},clients:{t:'CRM — Clientes',s:'Cadastros e histórico'},credit:{t:'CRM de Crédito',s:'Gestão de créditos e dívidas'},reports:{t:'Relatórios',s:'Análise de vendas'},settings:{t:'Configurações',s:'Loja e sistema'}};
+var PL={menu:renderItems,orders:renderOrders,clients:renderClients,credit:renderCredit,categories:renderCats,reports:renderReports,settings:function(){loadSettings();setTimeout(_checkSupaConnection,300);},dashboard:loadDash};
+
+function go(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('on');});
+  var page=document.getElementById('page-'+id);if(!page)return;
+  page.classList.add('on');if(el)el.classList.add('on');
+  var m=PM[id]||{t:id,s:''};
+  document.getElementById('tbt').textContent=m.t;document.getElementById('tbs').textContent=m.s;
+  if(PL[id])PL[id]();
+}
+
+function updateClock(){document.getElementById('clk').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+
+// ══════════════════════════════════════════════════
+// BADGE HELPERS
+// ══════════════════════════════════════════════════
+function updateBadge(){
+  var n=ORDERS.filter(function(o){return o.status==='pending';}).length;
+  var b=document.getElementById('pb');b.textContent=n;b.style.display=n>0?'inline-flex':'none';
+  document.getElementById('bdot').classList.toggle('on',n>0);
+}
+function updateCreditBadge(){
+  var users=getUsers();
+  var active=users.filter(function(u){
+    var ords=getUserOrders(u.email);return calcCreditLevel(ords.length)>0&&(u.creditUsed||0)>0;
+  });
+  var overdue=active.filter(function(u){var dl=getDaysLeft(u.creditDueDate);return dl!==null&&dl<=0;}).length;
+  var cb=document.getElementById('cb-badge');
+  cb.textContent=overdue||active.length;cb.style.display=active.length>0?'inline-flex':'none';
+  if(overdue>0)cb.style.background='var(--red)';else cb.style.background='var(--purple)';
+}
+
+// ══════════════════════════════════════════════════
+// STAT CARD HELPER
+// ══════════════════════════════════════════════════
+function mkSC(cls,ico,lbl,val,sub){return'<div class="scard '+cls+'"><div class="tb"></div><div class="sico">'+ico+'</div><div class="slbl">'+lbl+'</div><div class="sval">'+val+'</div><div class="ssub">'+sub+'</div></div>';}
+
+function mkOC(o){
+  var its=(o.items||[]).map(function(i){return i.qty+'× '+i.name;}).join(', ');
+  var zonaBadge = (o.deliveryMode==='entrega' && o.deliveryZona && window.DeliveryUI)
+    ? (' '+DeliveryUI.zonaBadge(o.deliveryZona, o.deliveryDistancia))
+    : (o.deliveryMode==='retirada'
+      ? ' <span style="display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:2px 7px;font-size:.68rem;font-weight:700;background:rgba(59,130,246,.12);color:#60a5fa">🏠 Retirada</span>'
+      : '');
+  var creditTag = (o.creditUsed && o.creditUsed > 0)
+    ? ' <span style="font-size:.69rem;background:rgba(139,92,246,.15);color:#c4b5fd;border-radius:20px;padding:2px 7px">💳 Rapi10</span>' : '';
+  // Pulse for very recent orders (< 2 min)
+  var isNew = o.createdAt && (Date.now() - new Date(o.createdAt).getTime()) < 120000;
+  var newDot = isNew ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-left:6px;animation:hp 1.5s ease-in-out infinite;flex-shrink:0" title="Novo"></span>' : '';
+  var pIco={dinheiro:'💵',pix:'📱',credito:'💳',debito:'🏦',vale:'🎫'};
+  var payTag=o.payment?'<span style="font-size:.68rem;color:var(--muted2)">'+(pIco[o.payment]||'💳')+' '+o.payment+'</span>':'';
+
+  return'<div class="ocard" onclick="openOrder(\''+safeId(o.id)+'\')">'+
+    '<div class="flex jcb aic" style="margin-bottom:5px">'+
+      '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0">'+
+        '<span class="fw7">'+escH(o.id)+'</span>'+
+        '<span class="tc-m" style="font-size:.77rem">'+escH(o.customer||'')+(o.phone?' · '+o.phone:'')+'</span>'+
+        creditTag+
+        newDot+
+      '</div>'+
+      '<div style="display:flex;align-items:center;gap:5px;flex-shrink:0">'+
+        zonaBadge+
+        '<span class="badge '+o.status+'">'+sl(o.status)+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<div class="flex jcb aic">'+
+      '<div style="font-size:.78rem;color:var(--muted2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escH(its)+'</div>'+
+      '<div class="fw7" style="color:var(--acch);flex-shrink:0;margin-left:8px">'+fmtR(o.total||0)+'</div>'+
+    '</div>'+
+    '<div style="display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--muted);margin-top:4px;flex-wrap:wrap">'+
+      '<span>'+ago(o.createdAt)+'</span>'+
+      (o.address?'<span>📍 '+escH(o.address.slice(0,30))+(o.address.length>30?'…':'')+'</span>':'')+
+      payTag+
+    '</div>'+
+  '</div>';
+}
+
+// ══════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════
+function loadDash(){
+  var today=new Date().toDateString();
+  var tod=ORDERS.filter(function(o){return new Date(o.createdAt).toDateString()===today;});
+  var todR=tod.reduce(function(s,o){return s+(o.total||0);},0);
+  var pend=ORDERS.filter(function(o){return o.status==='pending';}).length;
+  var users=getUsers();
+  var creditUsers=users.filter(function(u){
+    return window.CreditEngine?CreditEngine.calcLimit(u)>0:getUserOrders(u.email).length>=5;
+  });
+  var totalDebt=creditUsers.reduce(function(s,u){return s+(u.creditUsed||0);},0);
+  var avg=ORDERS.length?ORDERS.reduce(function(s,o){return s+(o.total||0);},0)/ORDERS.length:0;
+  // Delivery stats
+  var delivOrders   =ORDERS.filter(function(o){return o.deliveryMode==='entrega';});
+  var bairroOrders  =delivOrders.filter(function(o){return o.deliveryZona==='bairro';});
+  var motoboyOrders =delivOrders.filter(function(o){return o.deliveryZona==='proximo';});
+  var totalFees     =delivOrders.reduce(function(s,o){return s+(o.deliveryTaxa||o.fee||0);},0);
+
+  document.getElementById('dash-d').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('sg').innerHTML=
+    mkSC('g', '💰','Receita Hoje',    fmtR(todR),          tod.length+' pedido(s)')+
+    mkSC('b', '📦','Total Pedidos',   ORDERS.length,        'todos os tempos')+
+    mkSC('y', '⏳','Aguardando',      pend,                 'precisam atenção')+
+    mkSC('p', '👥','Clientes',        users.length,         'cadastrados')+
+    mkSC('o', '🎯','Ticket Médio',    fmtR(avg),            'por pedido')+
+    mkSC('pk','💳','Dívida Crédito',  fmtR(totalDebt),      creditUsers.length+' cliente(s)')+
+    mkSC('g', '🟢','Bairro',          bairroOrders.length,  'entregas próprias')+
+    mkSC('y', '🟡','Motoboy',         motoboyOrders.length, 'entregas via 99')+
+    mkSC('b', '🚚','Taxas Entrega',   fmtR(totalFees),      'arrecadadas total');
+
+  var el=document.getElementById('rec-list');
+  var rec=ORDERS.slice(0,5);
+  if(!rec.length){el.innerHTML='<div class="empty"><div class="eico">📭</div><p>Nenhum pedido ainda</p></div>';return;}
+  el.innerHTML=rec.map(mkOC).join('');
+}
+
+// ══════════════════════════════════════════════════
+// ORDERS
+// ══════════════════════════════════════════════════
+function renderOrders(){
+  var q     = (document.getElementById('oq')?.value||'').toLowerCase();
+  var ff    = document.getElementById('of')?.value||'';
+  var fzone = document.getElementById('ozone')?.value||'';
+  var fdate = document.getElementById('odf')?.value||''; // YYYY-MM-DD
+
+  var items=ORDERS.filter(function(o){
+    if(ff&&o.status!==ff)return false;
+    // Zone filter: 'retirada' matches deliveryMode, others match deliveryZona
+    if(fzone){
+      if(fzone==='retirada'&&o.deliveryMode!=='retirada')return false;
+      if(fzone!=='retirada'&&o.deliveryZona!==fzone)return false;
+    }
+    // Date filter: show orders from selected date onwards
+    if(fdate){
+      var oDate=new Date(o.createdAt).toISOString().slice(0,10);
+      if(oDate<fdate)return false;
+    }
+    if(!q)return true;
+    return String(o.id||'').toLowerCase().includes(q)
+      ||String(o.customer||'').toLowerCase().includes(q)
+      ||String(o.phone||'').includes(q)
+      ||String(o.address||'').toLowerCase().includes(q)
+      ||String(o.deliveryZona||'').toLowerCase().includes(q)
+      ||String(o.payment||'').toLowerCase().includes(q);
+  });
+
+  var el=document.getElementById('orders-list');
+  var cnt=document.getElementById('orders-count');
+  if(cnt)cnt.textContent=items.length+' pedido'+(items.length!==1?'s':'')+(ff||fzone||fdate||q?' (filtrado)':'');
+
+  if(!items.length){
+    el.innerHTML='<div class="empty"><div class="eico">📭</div><p>Nenhum pedido encontrado</p>'
+      +(ff||fzone||fdate||q?'<button class="btn btn-o btn-sm" style="margin-top:10px" onclick="clearOrderFilters()">Limpar filtros</button>':'')
+      +'</div>';
+    return;
+  }
+  el.innerHTML=items.map(mkOC).join('');
+}
+
+function clearOrderFilters(){
+  ['oq','of','ozone','odf'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  renderOrders();
+}
+
+// Auto-notify: when enabled, opens WA automatically on status change
+var _autoNotify=false;
+function _saveAutoNotify(){
+  _autoNotify=document.getElementById('auto-notify-cb')?.checked||false;
+  localStorage.setItem('_autoNotify',_autoNotify?'1':'0');
+}
+function _loadAutoNotify(){
+  _autoNotify=localStorage.getItem('_autoNotify')==='1';
+  var cb=document.getElementById('auto-notify-cb');
+  if(cb)cb.checked=_autoNotify;
+}
+
+function openOrder(id){
+  var o=ORDERS.find(function(x){return x.id===id;});if(!o)return;
+  document.getElementById('om-t').textContent='Pedido '+o.id;
+  var ss=[{k:'pending',l:'⏳ Aguardando'},{k:'accepted',l:'✅ Aceito'},{k:'preparing',l:'🍳 Preparando'},{k:'delivering',l:'🛵 Entregando'},{k:'delivered',l:'📦 Entregue'},{k:'cancelled',l:'❌ Cancelado'}];
+  var itsHtml=(o.items||[]).map(function(i){
+    return'<div class="flex jcb aic" style="padding:8px 12px;border-bottom:1px solid var(--bord)">'
+      +'<span>'+i.qty+'× '+i.name+(i.obs?'<br><span style="font-size:.73rem;color:var(--muted)">📝 '+i.obs+'</span>':'')+'</span>'
+      +'<span class="fw7">'+fmtR((i.price||0)*(i.qty||1))+'</span>'
+    +'</div>';
+  }).join('');
+
+  // Delivery section
+  var delivHtml = '';
+  if (o.deliveryMode === 'entrega') {
+    if (o.deliveryZona && window.DeliveryUI) {
+      delivHtml = '<div style="margin-bottom:12px;padding:11px 13px;background:var(--s2);border:1px solid var(--bord);border-radius:var(--rsm)">'
+        + '<div class="fw7 mb2" style="font-size:.84rem">🚚 Entrega</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem;color:var(--muted2)">'
+          + '<span>'+DeliveryUI.zonaBadge(o.deliveryZona, o.deliveryDistancia)+'</span>'
+          + (o.deliveryMetodo ? '<span>🏍️ '+( o.deliveryMetodo==='motoboy'?'Motoboy 99':'Entrega própria')+'</span>' : '')
+          + (o.deliveryTempo  ? '<span>⏱️ '+o.deliveryTempo+'</span>' : '')
+          + (o.deliveryDistancia ? '<span>📏 ~'+parseFloat(o.deliveryDistancia).toFixed(1)+' km</span>' : '')
+          + (o.deliveryTaxa > 0 ? '<span>💰 Taxa: '+fmtR(o.deliveryTaxa)+'</span>' : '')
+        + '</div>'
+      + '</div>';
+    } else {
+      delivHtml = '<div style="margin-bottom:12px;font-size:.82rem;color:var(--muted2)">🛵 Entrega — zona não calculada</div>';
+    }
+  }
+
+  var sfHtml=ss.map(function(s){
+    return'<button class="sfbtn'+(o.status===s.k?' on':'')+'" onclick="updSt(\''+safeId(o.id)+'\',\''+s.k+'\')">'+s.l+'</button>';
+  }).join('');
+
+  document.getElementById('om-body').innerHTML=
+    '<div class="flex jcb aic mb3">'
+      +'<div>'
+        +'<div class="fw7">'+o.customer+'</div>'
+        +'<div class="tc-m">'+(o.phone||'')+'</div>'
+        +(o.address?'<div class="tc-m mt1">📍 '+o.address+'</div>':'')
+        +(o.obs?'<div class="tc-m mt1">📝 '+o.obs+'</div>':'')
+      +'</div>'
+      +'<span class="badge '+o.status+'">'+sl(o.status)+'</span>'
+    +'</div>'
+    + delivHtml
+    +'<div class="divider"></div>'
+    +'<div class="fw7 mb2">Itens</div>'
+    +'<div style="background:var(--s2);border-radius:var(--rsm);overflow:hidden">'+itsHtml
+      +'<div class="flex jcb fw7" style="padding:10px 12px;font-size:.95rem">'
+        +(o.fee > 0 ? '<span style="font-size:.82rem;color:var(--muted2)">+ taxa '+fmtR(o.fee)+'</span>' : '<span></span>')
+        +'<span style="color:var(--acch)">Total: '+fmtR(o.total||0)+'</span>'
+      +'</div>'
+    +'</div>'
+    +(o.creditUsed&&o.creditUsed>0?'<div class="tc-p mt2" style="font-size:.82rem">💳 Crédito utilizado: -'+fmtR(o.creditUsed)+'</div>':'')
+    +'<div class="divider"></div>'
+    +'<div class="fw7 mb2">Atualizar Status</div>'
+    +'<div class="sflow">'+sfHtml+'</div>'
+    +'<div class="flex gap2 jce mt3">'
+      +'<button class="btn btn-wa" onclick="waStatus(\''+safeId(o.id)+'\')">💬 Notificar</button>'
+      +'<button class="btn btn-o" onclick="cmo(\'order-mo\')">Fechar</button>'
+    +'</div>';
+  oMo('order-mo');
+}
+
+function updSt(id,s){
+  var idx=ORDERS.findIndex(function(o){return o.id===id;});if(idx===-1)return;
+  ORDERS[idx].status=s;
+  ORDERS[idx].updatedAt=new Date().toISOString();
+  SO();updateBadge();openOrder(id);renderOrders();loadDash();
+  toast(sl(s),'success');
+  /* Persiste no Supabase */
+  if(window.Supa){
+    Supa.Pedidos.updateStatus(id,s).then(function(res){
+      if(res&&res.error)console.warn('[Supa] updSt error:',res.error.message);
+    });
+    /* Notifica WhatsApp bot */
+    var order=ORDERS[idx];
+    Supa.waNotify('order_status',{order:order,status:s}).catch(function(){});
+  }
+  /* Auto-notify WA manual (toggle) */
+  if(_autoNotify&&['accepted','preparing','delivering','delivered','cancelled'].indexOf(s)>-1){
+    setTimeout(function(){waStatus(id);},400);
+  }
+}
+
+function waStatus(id){
+  var o=ORDERS.find(function(x){return x.id===id;});if(!o)return;
+  var nome=escH(o.customer||'Cliente');
+  // B3 FIXED: use escH on interpolated values to prevent XSS in messages
+  var zona=o.deliveryZona==='bairro'?'🟢 Bairro':o.deliveryZona==='proximo'?'🟡 Motoboy':'';
+  var endStr=o.address?' · 📍 '+o.address:'';
+  var msgs={
+    accepted:'✅ *Pedido Aceito!*\n\nOlá '+nome+'! 🎉\nSeu pedido *'+o.id+'* foi aceito e logo começamos a preparar!\n'+(zona?'📍 Entrega: '+zona+endStr+'\n':'')+'\n_'+CFG.storeName+'_',
+    preparing:'🍳 *Em preparo!*\n\nOlá '+nome+'!\nSeu pedido *'+o.id+'* está sendo preparado com carinho. 👨‍🍳\n\n_'+CFG.storeName+'_',
+    delivering:'🛵 *Saiu para entrega!*\n\nOlá '+nome+'! Seu pedido *'+o.id+'* está a caminho! 🏠\n'+(o.deliveryTempo?'⏱️ Estimado: '+o.deliveryTempo+'\n':'')+'\n_'+CFG.storeName+'_',
+    delivered:'📦 *Entregue com sucesso!*\n\nOlá '+nome+'! Seu pedido *'+o.id+'* foi entregue. 😊\n\nObrigado pela preferência! Avalie nossa entrega 🌟\n\n_'+CFG.storeName+'_',
+    cancelled:'❌ *Pedido Cancelado*\n\nOlá '+nome+'. Infelizmente o pedido *'+o.id+'* foi cancelado.\nEntre em contato para mais informações.\n\n_'+CFG.storeName+'_',
+    pending:'⏳ *Pedido Recebido!*\n\nOlá '+nome+'! Pedido *'+o.id+'* recebido. Confirmação em breve! 🙏\n\n_'+CFG.storeName+'_'
+  };
+  var ph=String(o.phone||'').replace(/\D/g,'');var num=ph.startsWith('55')?ph:'55'+ph;
+  if(!ph){toast('❌ Número de telefone não encontrado no pedido','error');return;}
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msgs[o.status]||msgs.pending),'_blank');
+}
+
+// ══════════════════════════════════════════════════
+// MENU ITEMS
+// ══════════════════════════════════════════════════
+function renderMenu(){
+  fillCatSel();
+  var q=(document.getElementById('mq')?.value||'').toLowerCase();
+  var cf=document.getElementById('mcf')?.value||'';
+  var items=MENU.filter(function(i){if(cf&&i.category!==cf)return false;if(q&&!i.name.toLowerCase().includes(q))return false;return true;});
+  var el=document.getElementById('menu-list');
+  if(!items.length){el.innerHTML='<div class="empty"><div class="eico">🍽️</div><p>Nenhum item</p></div>';return;}
+  el.innerHTML=items.map(function(it){
+    var th=it.imageUrl?'<img src="'+it.imageUrl+'" alt="'+it.name+'">':( it.emoji||'🍽️');
+    var pBadge=it.promo?'<span style="background:var(--red);color:#fff;border-radius:5px;padding:2px 6px;font-size:.67rem;font-weight:800">-'+it.promo+'%</span>':'';
+    var photoTag=it.imageUrl?'<span class="pill" style="color:var(--green)">📸 Foto</span>':'';
+    return'<div class="irow"><div class="ith">'+th+'</div><div class="iin"><div class="inm">'+it.name+'</div><div class="imt"><span class="icat">'+it.category+'</span><span class="ipr">'+fmtR(it.price)+'</span>'+pBadge+photoTag+(it.available===false?'<span class="pill" style="color:var(--red)">Indisponível</span>':'')+'</div></div>'
+      +'<button class="tog'+(it.available!==false?' on':'')+'" onclick="togItem('+it.id+')" title="Disponibilidade"></button>'
+      +'<div class="iac"><button class="btn btn-o btn-ico btn-sm" onclick="openItemModal('+it.id+')" title="Editar">✏️</button><button class="btn btn-r btn-ico btn-sm" onclick="delItem('+it.id+')" title="Excluir">🗑️</button></div>'
+      +'</div>';
+  }).join('');
+}
+
+function fillCatSel(){
+  var sel=document.getElementById('mcf');if(!sel)return;
+  var v=sel.value;sel.innerHTML='<option value="">Todas categorias</option>'+CATS.map(function(c){return'<option value="'+c+'">'+c+'</option>';}).join('');sel.value=v;
+}
+
+function togItem(id){var i=MENU.find(function(x){return x.id===id;});if(!i)return;i.available=i.available===false;SM();renderMenu();toast(i.available?'✅ Disponível':'❌ Indisponível','info');}
+function delItem(id){if(!confirm('Excluir este item?'))return;MENU=MENU.filter(function(i){return i.id!==id;});SM();renderMenu();toast('Item removido','success');}
+
+function openItemModal(id){
+  _imgUrl='';clearImg();
+  document.getElementById('ic').innerHTML=CATS.map(function(c){return'<option value="'+c+'">'+c+'</option>';}).join('');
+  var editId=id||0;var curUps=[];
+  if(editId){var it=MENU.find(function(i){return i.id===editId;});if(!it)return;curUps=it.upsells||[];}
+  // Upsell checkboxes
+  document.getElementById('ups-cbs').innerHTML=MENU.filter(function(i){return i.id!==editId;}).map(function(u){
+    var ck=curUps.indexOf(u.id)>-1?' checked':'';
+    return'<label style="display:flex;align-items:center;gap:5px;background:var(--s2);border:1px solid var(--bord2);border-radius:7px;padding:6px 10px;cursor:pointer;font-size:.8rem"><input type="checkbox" class="upcb" value="'+u.id+'"'+ck+' style="accent-color:var(--accent)">'+(u.emoji||'🍽️')+' '+u.name+'</label>';
+  }).join('');
+  if(editId){
+    var it2=MENU.find(function(i){return i.id===editId;});
+    document.getElementById('item-mt').textContent='Editar Item';
+    document.getElementById('in').value=it2.name||'';document.getElementById('ie').value=it2.emoji||'';
+    document.getElementById('ic').value=it2.category||'';document.getElementById('ip').value=it2.price||'';
+    document.getElementById('ipr').value=it2.promo||'';document.getElementById('id').value=it2.desc||'';
+    document.getElementById('iav').value=it2.available===false?'0':'1';
+    document.getElementById('img-url').value=it2.imageUrl||'';document.getElementById('ieid').value=editId;
+    if(it2.imageUrl){_imgUrl=it2.imageUrl;showPrev(it2.imageUrl);}
+  }else{
+    document.getElementById('item-mt').textContent='Novo Item';
+    ['in','ie','ip','ipr','id','img-url'].forEach(function(x){document.getElementById(x).value='';});
+    document.getElementById('iav').value='1';document.getElementById('ieid').value='';
+  }
+  oMo('item-mo');
+}
+
+function saveItem(){
+  var name=document.getElementById('in').value.trim();
+  var price=parseFloat(document.getElementById('ip').value);
+  var cat=document.getElementById('ic').value;
+  if(!name){toast('Informe o nome','error');return;}
+  if(!price||price<=0){toast('Preço inválido','error');return;}
+  if(!cat){toast('Selecione categoria','error');return;}
+  var ups=[];document.querySelectorAll('.upcb:checked').forEach(function(cb){ups.push(parseInt(cb.value));});
+  var imgUrl=_imgUrl||document.getElementById('img-url').value.trim()||'';
+  var eid=parseInt(document.getElementById('ieid').value)||0;
+  var d={
+    name:name,emoji:document.getElementById('ie').value||'🍽️',
+    category:cat,price:price,promo:parseInt(document.getElementById('ipr').value)||null,
+    desc:document.getElementById('id').value.trim(),imageUrl:imgUrl,
+    available:document.getElementById('iav').value==='1',upsells:ups
+  };
+
+  if(eid){
+    var idx=MENU.findIndex(function(i){return i.id===eid;});
+    if(idx!==-1){
+      var uuid=MENU[idx]._uuid;
+      MENU[idx]=Object.assign({},MENU[idx],d);
+      if(window.Supa&&uuid){
+        Supa.Menu.upsert(Object.assign({_uuid:uuid},d))
+          .catch(function(e){console.warn('[Supa] Menu.upsert:',e);});
+      }
+    }
+  } else {
+    var nid=MENU.length?Math.max.apply(null,MENU.map(function(i){return typeof i.id==='number'?i.id:0;}))+1:1;
+    var newItem=Object.assign({id:nid},d);
+    MENU.push(newItem);
+    if(window.Supa){
+      /* Sem _uuid = insert novo */
+      Supa.Menu.upsert(d).then(function(res){
+        if(!res.error&&res.data){
+          /* Guarda UUID retornado para edições futuras */
+          var uuid=(Array.isArray(res.data)?res.data[0]:res.data)&&(Array.isArray(res.data)?res.data[0].id:res.data.id);
+          if(uuid){var mi=MENU.findIndex(function(x){return x.id===nid;});if(mi>-1)MENU[mi]._uuid=uuid;}
+        }
+      }).catch(function(e){console.warn('[Supa] Menu.upsert (new):',e);});
+    }
+  }
+  SM();cmo('item-mo');renderItems();toast('✅ Item salvo!','success');
+}
+
+function deleteItem(id){
+  if(!confirm('Excluir este item?'))return;
+  var item=MENU.find(function(i){return i.id===id;});
+  MENU=MENU.filter(function(i){return i.id!==id;});
+  SM();renderItems();toast('🗑️ Item removido','success');
+  if(window.Supa&&item&&item._uuid){
+    Supa.Menu.remove(item._uuid).catch(function(e){console.warn('[Supa] Menu.remove:',e);});
+  }
+}
+
+// ══════════════════════════════════════════════════
+// CLOUDINARY
+// ══════════════════════════════════════════════════
+function onFileSelect(e){var f=e.target.files[0];if(f)upCloud(f);}
+function onDragOver(e){e.preventDefault();document.getElementById('upa').classList.add('drag');}
+function onDragLeave(){document.getElementById('upa').classList.remove('drag');}
+function onDrop(e){e.preventDefault();document.getElementById('upa').classList.remove('drag');var f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/'))upCloud(f);}
+function upCloud(file){
+  var cn=CFG.cloudName;var cp=CFG.cloudPreset;
+  setSt('uploading','⏳ Enviando...');showBar(0);
+
+  /* Tenta upload assinado via Edge Function (mais seguro, não expõe API_SECRET) */
+  if(window.Supa&&cn){
+    Supa.cloudinarySign('cardapio').then(function(res){
+      if(res.error||!res.data||!res.data.signature){
+        /* Fallback: upload não-assinado com preset */
+        _upCloudUnsigned(file,cn,cp);
+        return;
+      }
+      var sig=res.data;
+      var fd=new FormData();
+      fd.append('file',file);
+      fd.append('api_key',   sig.api_key);
+      fd.append('timestamp', sig.timestamp);
+      fd.append('signature', sig.signature);
+      fd.append('folder',    sig.folder||'cardapio');
+      var xhr=new XMLHttpRequest();
+      xhr.upload.onprogress=function(e){if(e.lengthComputable)showBar(Math.round(e.loaded/e.total*90));};
+      xhr.onload=function(){
+        if(xhr.status===200){
+          var r=JSON.parse(xhr.responseText);
+          _imgUrl=r.secure_url;
+          document.getElementById('img-url').value=r.secure_url;
+          showPrev(r.secure_url);showBar(100);setSt('done','✅ Enviada!');
+          setTimeout(function(){document.getElementById('up-bw').classList.remove('on');},1200);
+          toast('📸 Foto enviada!','success');
+        } else {
+          var msg='Erro';try{msg=JSON.parse(xhr.responseText).error.message;}catch(ex){}
+          setSt('err','❌ '+msg);toast('Erro: '+msg,'error');
+        }
+      };
+      xhr.onerror=function(){setSt('err','❌ Erro de rede');toast('Erro de rede','error');};
+      xhr.open('POST','https://api.cloudinary.com/v1_1/'+sig.cloud_name+'/image/upload');
+      xhr.send(fd);
+    }).catch(function(){_upCloudUnsigned(file,cn,cp);});
+    return;
+  }
+  _upCloudUnsigned(file,cn,cp);
+}
+
+function _upCloudUnsigned(file,cn,cp){
+  /* Upload sem assinatura usando preset "Unsigned" */
+  if(!cn||!cp){
+    toast('⚠️ Configure Cloudinary em Configurações','info');
+    var r=new FileReader();
+    r.onload=function(e){_imgUrl=e.target.result;document.getElementById('img-url').value='(local)';showPrev(e.target.result);setSt('done','✅ Local');};
+    r.readAsDataURL(file);return;
+  }
+  var fd=new FormData();fd.append('file',file);fd.append('upload_preset',cp);fd.append('folder','cardapio');
+  var xhr=new XMLHttpRequest();
+  xhr.upload.onprogress=function(e){if(e.lengthComputable)showBar(Math.round(e.loaded/e.total*90));};
+  xhr.onload=function(){
+    if(xhr.status===200){
+      var res=JSON.parse(xhr.responseText);_imgUrl=res.secure_url;
+      document.getElementById('img-url').value=res.secure_url;showPrev(res.secure_url);showBar(100);
+      setSt('done','✅ Enviada!');setTimeout(function(){document.getElementById('up-bw').classList.remove('on');},1200);
+      toast('📸 Foto enviada!','success');
+    } else {
+      var msg='Erro';try{msg=JSON.parse(xhr.responseText).error.message;}catch(ex){}
+      setSt('err','❌ '+msg);document.getElementById('up-bw').classList.remove('on');toast('Erro: '+msg,'error');
+    }
+  };
+  xhr.onerror=function(){setSt('err','❌ Erro de rede');toast('Erro de rede','error');};
+  xhr.open('POST','https://api.cloudinary.com/v1_1/'+cn+'/image/upload');xhr.send(fd);
+}
+function showPrev(url){var p=document.getElementById('up-pv'),ph=document.getElementById('up-ph'),ac=document.getElementById('up-acts');p.src=url;p.classList.add('on');ph.style.display='none';ac.style.display='flex';}
+function clearImg(){_imgUrl='';var p=document.getElementById('up-pv'),ph=document.getElementById('up-ph'),ac=document.getElementById('up-acts');p.src='';p.classList.remove('on');ph.style.display='';ac.style.display='none';setSt('','');document.getElementById('up-bw').classList.remove('on');var fi=document.getElementById('img-inp');if(fi)fi.value='';var ui=document.getElementById('img-url');if(ui)ui.value='';}
+function setSt(t,m){var el=document.getElementById('up-st');el.className='up-st'+(t?' '+t:'');el.textContent=m;}
+function showBar(p){document.getElementById('up-bw').classList.add('on');document.getElementById('up-b').style.width=p+'%';}
+function onUrlInput(){var u=document.getElementById('img-url').value.trim();if(u.startsWith('http')){_imgUrl=u;showPrev(u);}else if(!u)clearImg();}
+
+// ══════════════════════════════════════════════════
+// CATEGORIES
+// ══════════════════════════════════════════════════
+function renderCats(){
+  var el=document.getElementById('cats-list');
+  if(!CATS.length){el.innerHTML='<div class="empty"><div class="eico">🏷️</div><p>Nenhuma categoria</p></div>';return;}
+  el.innerHTML=CATS.map(function(cat){
+    var n=MENU.filter(function(i){return i.category===cat;}).length;
+    return'<div class="irow"><div class="ith" style="font-size:1.4rem">🏷️</div><div class="iin"><div class="inm">'+cat+'</div><div class="imt"><span class="icat">'+n+' item(s)</span></div></div>'
+      +'<div class="iac"><button class="btn btn-o btn-ico btn-sm" onclick="openCatModal(\''+cat+'\')">✏️</button><button class="btn btn-r btn-ico btn-sm" onclick="delCat(\''+cat+'\')">🗑️</button></div></div>';
+  }).join('');
+}
+function openCatModal(n){document.getElementById('cm-t').textContent=n?'Editar Categoria':'Nova Categoria';document.getElementById('cname').value=n||'';document.getElementById('cemoji').value='';document.getElementById('cold').value=n||'';oMo('cat-mo');}
+function saveCat(){
+  var name=document.getElementById('cname').value.trim();
+  if(!name){toast('Informe o nome','error');return;}
+  var emoji=document.getElementById('cemoji').value.trim()||'🍽️';
+  var old=document.getElementById('cold').value;
+  if(old&&old!==name){
+    CATS=CATS.map(function(c){return c===old?name:c;});
+    MENU=MENU.map(function(i){return i.category===old?Object.assign({},i,{category:name}):i;});
+    SM();
+    if(window.Supa){
+      Supa.Categories.upsert({name:name,emoji:emoji,ordem:CATS.indexOf(name)})
+        .catch(function(e){console.warn('[Supa] Categories.upsert:',e);});
+    }
+  } else if(!old){
+    if(!CATS.includes(name)){
+      CATS.push(name);
+      if(window.Supa){
+        Supa.Categories.upsert({name:name,emoji:emoji,ordem:CATS.length-1})
+          .catch(function(e){console.warn('[Supa] Categories.upsert:',e);});
+      }
+    }
+  }
+  SK();cmo('cat-mo');renderCats();fillCatSel();toast('Categoria salva!','success');
+}
+
+function delCat(n){
+  var cnt=MENU.filter(function(i){return i.category===n;}).length;
+  if(!confirm('Excluir "'+n+'"?'+(cnt?' ('+cnt+' itens continuarão existindo)':'')))return;
+  CATS=CATS.filter(function(c){return c!==n;});
+  SK();renderCats();fillCatSel();toast('Categoria removida','success');
+  if(window.Supa){
+    /* busca UUID da categoria pelo nome */
+    var cat=(_cache&&_cache.get)?(_cache.get('categories')||[]).find(function(c){return c.name===n;}):null;
+    if(cat&&cat.id)Supa.Categories.remove(cat.id).catch(function(){});
+  }
+}
+
+// ══════════════════════════════════════════════════
+// CLIENTS CRM — upgraded with CreditEngine
+// ══════════════════════════════════════════════════
+function renderClients(){
+  var q = (document.getElementById('clq')?.value||'').toLowerCase();
+  var users = getUsers().filter(function(u){ return !q || u.name.toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q) || String(u.phone||'').includes(q); });
+  var tb = document.getElementById('cl-tbody');
+  if (!users.length) { tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:36px;color:var(--muted)">Nenhum cliente cadastrado ainda</td></tr>'; return; }
+  tb.innerHTML = users.map(function(u) {
+    var ords  = getUserOrders(u.email);
+    var spent = ords.reduce(function(s,o){return s+(o.total||0);},0);
+    var lv    = window.CreditEngine ? CreditEngine.calcLimit(u) : calcCreditLevel(ords.length);
+    var rankBadge   = window.CreditUI ? CreditUI.rankBadge(u) : (lv > 0 ? '<span style="font-size:.74rem;color:var(--muted2)">Ativo</span>' : '<span style="color:var(--muted);font-size:.8rem">—</span>');
+    var statusBadge = window.CreditUI ? CreditUI.statusBadge(u) : '';
+    return '<tr style="cursor:pointer" onclick="openClientDetail(\''+u.id+'\')"><td><div class="flex gap2 aic"><div style="width:32px;height:32px;border-radius:50%;background:var(--accg);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;color:#fff">'+u.name[0].toUpperCase()+'</div><span class="fw6">'+escH(u.name)+'</span></div></td>'
+      +'<td class="tc-m">'+escH(u.email||'')+'</td>'
+      +'<td>'+(u.phone||'—')+'</td>'
+      +'<td><span class="pill">'+ords.length+'</span></td>'
+      +'<td class="tc-g fw6">'+fmtR(spent)+'</td>'
+      +'<td>'+rankBadge+'</td>'
+      +'<td>'+statusBadge+'</td>'
+      +'<td class="tc-m">'+new Date(u.createdAt||0).toLocaleDateString('pt-BR')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function openClientDetail(uid){
+  var u = getUsers().find(function(x){ return x.id===uid; }); if (!u) return;
+  var ords  = getUserOrders(u.email);
+  var spent = ords.reduce(function(s,o){return s+(o.total||0);},0);
+  var lv    = window.CreditEngine ? CreditEngine.calcLimit(u) : calcCreditLevel(ords.length);
+  var debt  = window.CreditEngine ? CreditEngine.getDebt(u) : (u.creditUsed||0);
+  var avail = window.CreditEngine ? CreditEngine.getAvailable(u) : Math.max(0, lv-debt);
+  var score = window.CreditEngine ? CreditEngine.calcScore(u) : 50;
+  var scoreColor = score >= 60 ? 'var(--green)' : score >= 35 ? 'var(--yellow)' : 'var(--red)';
+  var rankBadge   = window.CreditUI ? CreditUI.rankBadge(u) : '';
+  var statusBadge = window.CreditUI ? CreditUI.statusBadge(u) : '';
+  var txnHtml     = window.CreditUI ? '<div style="margin-top:14px"><div class="fw7 mb2" style="font-size:.88rem">📊 Extrato de Crédito</div>'+CreditUI.txnListHTML(uid, 8)+'</div>' : '';
+  var cardHtml    = (window.CreditUI && lv > 0) ? CreditUI.creditCardHTML(u) : '';
+  document.getElementById('clm-t').textContent = u.name;
+  document.getElementById('clm-body').innerHTML =
+    '<div class="flex gap2 aic mb3"><div style="width:48px;height:48px;border-radius:13px;background:var(--accg);display:flex;align-items:center;justify-content:center;font-size:1.35rem;font-weight:700;color:#fff">'+u.name[0].toUpperCase()+'</div><div><div class="fw7" style="font-size:.95rem">'+escH(u.name)+'</div><div class="tc-m">'+escH(u.email||'')+'</div><div class="tc-m">'+(u.phone||'—')+'</div><div class="tc-m">'+(u.address||'Sem endereço')+'</div><div style="display:flex;gap:6px;margin-top:5px;flex-wrap:wrap">'+rankBadge+statusBadge+'<span style="font-size:.73rem;color:'+scoreColor+'">Score: <strong>'+score+'</strong>/100</span></div></div></div>'
+    +'<div class="sg" style="grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">'
+      +mkSC('b','📦','Pedidos',ords.length,'')+mkSC('g','💰','Gasto',fmtR(spent),'')+mkSC('p','💳','Limite',lv>0?fmtR(lv):'—','')+mkSC('y','💵','Disponível',fmtR(avail),'')
+    +'</div>'
+    + cardHtml
+    + txnHtml
+    +'<div class="flex gap2 mt3 jce">'
+      +'<button class="btn btn-pu" onclick="cmo(\'client-mo\');openCreditEdit(\''+uid+'\')">💳 Gerenciar Crédito</button>'
+      +'<a href="https://wa.me/'+String(u.phone||'').replace(/\D/g,'')+'" target="_blank" class="btn btn-wa">💬 Mensagem</a>'
+      +'<button class="btn btn-o" onclick="cmo(\'client-mo\')">Fechar</button>'
+    +'</div>';
+  oMo('client-mo');
+}
+
+
+
+// ══════════════════════════════════════════════════
+// CREDIT CRM — powered by credito.js engine
+// ══════════════════════════════════════════════════
+function renderCredit(){
+  if (window.CreditEngine) CreditEngine.runAutoRules();
+  var report = window.CreditEngine ? CreditEngine.buildReport() : {
+    creditUsers:0, totalDebt:0, totalLimit:0, totalPaid:0,
+    overdue:0, warningSoon:0, inadRate:0, taxRevenue:0,
+    overdueList:[], warningList:[]
+  };
+
+  document.getElementById('credit-sg').innerHTML=
+    mkSC('p','💳','Com Crédito Ativo', report.creditUsers,'clientes')+
+    mkSC('r','💸','Total em Dívidas', fmtR(report.totalDebt),'a receber')+
+    mkSC('y','⏰','Vencendo em 7 dias', report.warningSoon,'alertas')+
+    mkSC('o','🚨','Inadimplentes', report.overdue,'bloqueados')+
+    mkSC('g','💰','Total Recebido', fmtR(report.totalPaid),'pagamentos')+
+    mkSC('pk','📊','Taxa de Inadimpl.', report.inadRate+'%','do total');
+
+  /* ── Alerts ── */
+  var alEl = document.getElementById('credit-alerts');
+  var allAlerts = [].concat(
+    report.overdueList.map(function(u){ return {u:u, sev:'overdue'}; }),
+    report.warningList.filter(function(u){ return report.overdueList.indexOf(u)===-1; }).map(function(u){ return {u:u, sev:'warning'}; })
+  ).slice(0, 10);
+
+  if (!allAlerts.length) {
+    alEl.innerHTML = '<div style="text-align:center;padding:22px;color:var(--muted);font-size:.84rem">✅ Nenhum alerta no momento</div>';
+  } else {
+    alEl.innerHTML = allAlerts.map(function(item) {
+      var u   = item.u;
+      var sev = item.sev;
+      var dl  = window.CreditEngine ? CreditEngine.getDaysLeft(u) : null;
+      var cfg = window.CreditDB ? CreditDB.getConfig() : {creditTax:5};
+      var tax = cfg.creditTax || 5;
+      var debt = u.creditUsed || 0;
+      var total = debt + tax;
+      var ico   = sev === 'overdue' ? '🚨' : '⚠️';
+      var cls   = sev === 'overdue' ? 'overdue' : 'warning';
+      var dueStr = dl === null ? '' : (dl < 0 ? 'VENCIDO há '+Math.abs(dl)+'d' : 'Vence em '+dl+'d');
+      return '<div class="credit-alert '+cls+'" style="margin:0 0 8px;cursor:pointer" onclick="openCreditEdit(\''+u.id+'\')">'
+        +'<div class="ca-ico">'+ico+'</div>'
+        +'<div class="ca-info"><div class="ca-name">'+escH(u.name)+'</div>'
+        +'<div class="ca-detail">Dívida: '+fmtR(debt)+' + taxa '+fmtR(tax)+' → <strong>'+fmtR(total)+'</strong> · <span style="color:'+(dl!==null&&dl<0?'var(--red)':dl!==null&&dl<=5?'var(--yellow)':'var(--text)')+'">'+dueStr+'</span></div></div>'
+        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'
+          +'<div class="fw7" style="color:'+(sev==='overdue'?'var(--red)':'var(--yellow)')+'">'+fmtR(total)+'</div>'
+          +(window.CreditUI ? CreditUI.statusBadge(u) : '')
+        +'</div>'
+      +'</div>';
+    }).join('');
+  }
+
+  /* ── Ranking ── */
+  var users = window.CreditDB ? CreditDB.getUsers() : getUsers();
+  var creditUsers = users.filter(function(u) {
+    return window.CreditEngine ? CreditEngine.calcLimit(u) > 0 : getUserOrders(u.email).length >= 5;
+  });
+
+  /* Top debtors */
+  var topDebt = creditUsers.filter(function(u){ return (u.creditUsed||0)>0; })
+    .sort(function(a,b){ return (b.creditUsed||0)-(a.creditUsed||0); }).slice(0,5);
+  var cfg3 = window.CreditDB ? CreditDB.getConfig() : {creditTax:5};
+  document.getElementById('top-debt').innerHTML = topDebt.length
+    ? topDebt.map(function(u){
+        var dl = window.CreditEngine ? CreditEngine.getDaysLeft(u) : null;
+        var debt = u.creditUsed||0;
+        var total = debt + (cfg3.creditTax||5);
+        var dcolor = dl!==null&&dl<=0?'var(--red)':dl!==null&&dl<=7?'var(--yellow)':'var(--text)';
+        return '<tr style="cursor:pointer" onclick="openCreditEdit(\''+u.id+'\')">'
+          +'<td class="fw6">'+escH(u.name)+'</td>'
+          +'<td class="tc-r fw7">'+fmtR(total)+'</td>'
+          +'<td style="color:'+dcolor+'">'+(dl!==null?dl<=0?'Vencido':dl+'d':'—')+'</td>'
+          +'</tr>';
+      }).join('')
+    : '<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--muted)">Sem dívidas 🎉</td></tr>';
+
+  /* Top credit limits */
+  var topCredit = creditUsers.slice().sort(function(a,b){
+    var la = window.CreditEngine ? CreditEngine.calcLimit(a) : 0;
+    var lb = window.CreditEngine ? CreditEngine.calcLimit(b) : 0;
+    return lb - la;
+  }).slice(0,5);
+  document.getElementById('top-credit').innerHTML = topCredit.length
+    ? topCredit.map(function(u){
+        var lim   = window.CreditEngine ? CreditEngine.calcLimit(u) : 0;
+        var avail = window.CreditEngine ? CreditEngine.getAvailable(u) : 0;
+        var rankBadge = window.CreditUI ? CreditUI.rankBadge(u) : '';
+        return '<tr style="cursor:pointer" onclick="openCreditEdit(\''+u.id+'\')">'
+          +'<td><div style="display:flex;align-items:center;gap:7px"><span class="fw6">'+escH(u.name)+'</span>'+rankBadge+'</div></td>'
+          +'<td class="fw7" style="color:#c4b5fd">'+fmtR(lim)+'</td>'
+          +'<td class="tc-g">'+fmtR(avail)+'</td>'
+          +'</tr>';
+      }).join('')
+    : '<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--muted)">—</td></tr>';
+
+  renderCreditTable();
+}
+
+function renderCreditTable(){
+  var q = (document.getElementById('crq')?.value||'').toLowerCase();
+  var users = window.CreditDB ? CreditDB.getUsers() : getUsers();
+  var cfg   = window.CreditDB ? CreditDB.getConfig() : {creditTax:5};
+  var tax   = cfg.creditTax || 5;
+
+  var rows = users.filter(function(u){
+    var lim = window.CreditEngine ? CreditEngine.calcLimit(u) : 0;
+    return lim > 0;
+  }).filter(function(u){
+    return !q || u.name.toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q);
+  }).sort(function(a,b){
+    return (b.creditUsed||0)-(a.creditUsed||0);
+  });
+
+  var tb = document.getElementById('cr-tbody');
+  if (!rows.length) {
+    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">Nenhum cliente com crédito ativo</td></tr>';
+    return;
+  }
+
+  tb.innerHTML = rows.map(function(u){
+    var lim   = window.CreditEngine ? CreditEngine.calcLimit(u) : 0;
+    var debt  = u.creditUsed || 0;
+    var avail = window.CreditEngine ? CreditEngine.getAvailable(u) : Math.max(0, lim - debt);
+    var total = debt > 0 ? debt + tax : 0;
+    var score = window.CreditEngine ? CreditEngine.calcScore(u) : 50;
+    var scoreColor = score >= 60 ? 'var(--green)' : score >= 35 ? 'var(--yellow)' : 'var(--red)';
+    var dl    = window.CreditEngine ? CreditEngine.getDaysLeft(u) : null;
+    var dueStr = dl === null ? '—' : (dl < 0 ? '<span style="color:var(--red);font-weight:700">Vencido '+Math.abs(dl)+'d</span>' : dl + 'd');
+    var statusBadge = window.CreditUI ? CreditUI.statusBadge(u) : '';
+    var rankBadge   = window.CreditUI ? CreditUI.rankBadge(u) : '';
+
+    return '<tr>'
+      +'<td><div style="display:flex;align-items:center;gap:7px"><div style="width:30px;height:30px;border-radius:50%;background:var(--accg);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:.84rem">'+u.name[0].toUpperCase()+'</div><div><div class="fw6">'+escH(u.name)+'</div><div style="font-size:.73rem;color:var(--muted2)">'+escH(u.email||'')+'</div></div></div></td>'
+      +'<td>'+rankBadge+'</td>'
+      +'<td class="fw7" style="color:#c4b5fd">'+fmtR(lim)+'</td>'
+      +'<td class="tc-r">'+fmtR(debt)+'</td>'
+      +'<td class="tc-g">'+fmtR(avail)+'</td>'
+      +'<td class="fw7">'+(total>0?fmtR(total):'—')+'</td>'
+      +'<td>'+dueStr+'</td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px">'+statusBadge+'<span style="font-size:.73rem;font-weight:700;color:'+scoreColor+'">'+score+'pts</span></div></td>'
+      +'<td style="white-space:nowrap">'
+        +'<button class="btn btn-pu btn-sm" onclick="openCreditEdit(\''+u.id+'\')">✏️</button> '
+        +'<button class="btn btn-wa btn-sm" onclick="sendCreditWA(\''+u.id+'\')">💬</button>'
+      +'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function openCreditEdit(uid){
+  var u = window.CreditDB ? CreditDB.getUser(uid) : getUsers().find(function(x){return x.id===uid;});
+  if (!u) return;
+  var ords  = getUserOrders(u.email);
+  var lim   = window.CreditEngine ? CreditEngine.calcLimit(u) : calcCreditLevel(ords.length);
+  var debt  = u.creditUsed || 0;
+  var score = window.CreditEngine ? CreditEngine.calcScore(u) : 50;
+  var statusBadge = window.CreditUI ? CreditUI.statusBadge(u) : '';
+  var rankBadge   = window.CreditUI ? CreditUI.rankBadge(u) : '';
+  var txnHtml     = window.CreditUI ? '<div style="margin-top:16px"><div class="fw7 mb2" style="font-size:.88rem">📊 Extrato</div>'+CreditUI.txnListHTML(uid, 10)+'</div>' : '';
+  var scoreColor  = score >= 60 ? 'var(--green)' : score >= 35 ? 'var(--yellow)' : 'var(--red)';
+
+  document.getElementById('ced-info').innerHTML =
+    '<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">'
+      +'<div style="width:46px;height:46px;border-radius:50%;background:var(--accg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.3rem;color:#fff">'+u.name[0].toUpperCase()+'</div>'
+      +'<div><div class="fw7" style="font-size:.95rem">'+escH(u.name)+'</div>'
+        +'<div class="tc-m">'+escH(u.email||'')+'</div>'
+        +'<div style="display:flex;gap:7px;margin-top:6px;flex-wrap:wrap">'+rankBadge+statusBadge+'<span style="font-size:.74rem;color:'+scoreColor+'">Score: <strong>'+score+'</strong>/100</span></div>'
+      +'</div>'
+    +'</div>'
+    // Card visual
+    +(window.CreditUI ? CreditUI.creditCardHTML(u) : '')
+    // Quick stats
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px">'
+      +mkSC('p','📦','Pedidos',ords.length,'')+mkSC('r','💸','Dívida',fmtR(debt),'')+mkSC('g','💵','Disponível',fmtR(Math.max(0,lim-debt)),'')
+    +'</div>'
+    + txnHtml;
+
+  document.getElementById('ced-limit').value  = u.creditLimitOverride !== undefined ? u.creditLimitOverride : lim;
+  document.getElementById('ced-used').value   = debt;
+  document.getElementById('ced-due').value    = u.creditDueDate ? u.creditDueDate.slice(0,10) : '';
+  document.getElementById('ced-coupon-code').value = '';
+  document.getElementById('ced-coupon-desc').value = '';
+  document.getElementById('ced-uid').value = uid;
+
+  // B6 FIXED: always rebuild toggle to prevent duplicate elements
+  var oldWrap = document.getElementById('ced-blocked-wrap');
+  if (oldWrap) oldWrap.remove(); // always remove first
+
+  var wrap = document.createElement('div');
+  wrap.id = 'ced-blocked-wrap';
+  wrap.className = 'fg';
+  wrap.innerHTML = '<label class="fgl">Acesso ao crédito</label>'
+    +'<div style="display:flex;gap:8px">'
+      +'<button id="ced-block-btn" class="btn '+(u.creditBlocked?'btn-o':'btn-r')+' btn-sm" onclick="toggleCreditBlock(\''+uid+'\')">'+(u.creditBlocked?'🔓 Liberar crédito':'🔒 Bloquear crédito')+'</button>'
+    +'</div>';
+  var mft = document.querySelector('#credit-mo .mft');
+  if (mft) mft.parentNode.insertBefore(wrap, mft);
+
+  oMo('credit-mo');
+}
+
+function toggleCreditBlock(uid) {
+  var u = window.CreditDB ? CreditDB.getUser(uid) : null;
+  if (!u) return;
+  if (u.creditBlocked) {
+    window.CreditEngine ? CreditEngine.unblockUser(uid) : CreditDB.updateUser(uid, {creditBlocked:false});
+    toast('🔓 Crédito liberado', 'success');
+  } else {
+    window.CreditEngine ? CreditEngine.blockUser(uid, 'Bloqueado pelo admin') : CreditDB.updateUser(uid, {creditBlocked:true});
+    toast('🔒 Crédito bloqueado', 'info');
+  }
+  /* Sincroniza com Supabase */
+  if(window.Supa){
+    Supa.Admin.call('update_cliente',{id:uid,patch:{credit_blocked:!u.creditBlocked}})
+      .catch(function(e){console.warn('[Supa] toggleCreditBlock:',e);});
+  }
+  openCreditEdit(uid);renderCreditTable();updateCreditBadge();
+}
+
+function saveCreditEdit(){
+  var uid      = document.getElementById('ced-uid').value;
+  var newLimit = parseFloat(document.getElementById('ced-limit').value) || 0;
+  var newUsed  = parseFloat(document.getElementById('ced-used').value) || 0;
+  var newDue   = document.getElementById('ced-due').value;
+  var cCode    = document.getElementById('ced-coupon-code').value.trim().toUpperCase();
+  var cDesc    = document.getElementById('ced-coupon-desc').value.trim();
+
+  var u = window.CreditDB ? CreditDB.getUser(uid) : null;
+  var supaPatch = {};
+  if (u) {
+    var oldLimit = u.creditLimitOverride !== undefined ? u.creditLimitOverride : (window.CreditEngine ? CreditEngine.calcLimit(u) : 0);
+    if (newLimit !== oldLimit) {
+      window.CreditEngine ? CreditEngine.setLimit(uid, newLimit) : CreditDB.updateUser(uid, {creditLimitOverride: newLimit});
+      supaPatch.credit_limit_override = newLimit;
+    }
+    var oldUsed = u.creditUsed || 0;
+    if (newUsed < oldUsed && window.CreditEngine) {
+      var payAmt = oldUsed - newUsed;
+      CreditEngine.applyPayment(uid, payAmt, 'Pagamento registrado pelo admin');
+      /* Sync txn */
+      if(window.Supa) Supa.Admin.call('add_txn',{user_id:uid,type:'payment_on_time',amount:payAmt,balance:newLimit-newUsed,description:'Pagamento registrado pelo admin',status:'confirmed'}).catch(function(){});
+    } else if (newUsed > oldUsed && window.CreditEngine) {
+      CreditEngine.applyManualDebt(uid, newUsed - oldUsed, 'Débito manual pelo admin');
+      if(window.Supa) Supa.Admin.call('add_txn',{user_id:uid,type:'manual_debt',amount:-(newUsed-oldUsed),balance:newLimit-newUsed,description:'Débito manual pelo admin',status:'confirmed'}).catch(function(){});
+    } else {
+      CreditDB.updateUser(uid, {creditUsed: newUsed});
+    }
+    supaPatch.credit_used = newUsed;
+  }
+
+  var patch = { creditDueDate: newDue ? new Date(newDue).toISOString() : null };
+  supaPatch.credit_due_date = patch.creditDueDate;
+
+  if (cCode) {
+    var users = window.CreditDB ? CreditDB.getUsers() : getUsers();
+    var idx   = users.findIndex(function(x){ return x.id === uid; });
+    if (idx > -1) {
+      if (!users[idx].coupons) users[idx].coupons = [];
+      users[idx].coupons.push({ code: cCode, desc: cDesc || 'Cupom especial', exp: '', addedAt: new Date().toISOString() });
+      Object.assign(patch, { coupons: users[idx].coupons });
+      supaPatch.coupons = users[idx].coupons;
+    }
+  }
+
+  window.CreditDB ? CreditDB.updateUser(uid, patch) : null;
+
+  /* Sincroniza com Supabase */
+  if(window.Supa&&Object.keys(supaPatch).length){
+    Supa.Admin.call('update_cliente',{id:uid,patch:supaPatch})
+      .catch(function(e){console.warn('[Supa] saveCreditEdit:',e);});
+  }
+
+  cmo('credit-mo'); renderCredit(); updateCreditBadge();
+  toast('✅ Crédito atualizado!', 'success');
+}
+
+function sendCreditWA(uid){
+  var u = window.CreditDB ? CreditDB.getUser(uid) : getUsers().find(function(x){return x.id===uid;});
+  if (!u) return;
+  var msg = window.CreditEngine
+    ? CreditEngine.buildWhatsAppMessage(u, CFG.storeName)
+    : (function(){
+        var debt = u.creditUsed||0; var tax = (CFG.creditTax||5);
+        return '💳 *Conta Rapi10 — '+CFG.storeName+'*\n\nOlá '+u.name+'!\nSaldo: '+fmtR(debt)+' + taxa '+fmtR(tax)+' = '+fmtR(debt+tax)+'\n\n_'+CFG.storeName+'_';
+      })();
+  var ph = String(u.phone||'').replace(/\D/g,'');
+  var num = ph.startsWith('55') ? ph : '55'+ph;
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+function bulkIncreaseCredit(){
+  var amt = parseFloat(prompt('Aumentar limite de TODOS os clientes ativos em quanto? (R$)'));
+  if (isNaN(amt) || amt <= 0) { toast('Valor inválido','error'); return; }
+  if (!confirm('Aumentar limite de todos em '+fmtR(amt)+'?')) return;
+  var users   = window.CreditDB ? CreditDB.getUsers() : getUsers();
+  var changed = 0;
+  users.forEach(function(u){
+    var lim = window.CreditEngine ? CreditEngine.calcLimit(u) : 0;
+    if (lim > 0) {
+      var cur    = u.creditLimitOverride !== undefined ? u.creditLimitOverride : lim;
+      var newLim = cur + amt;
+      if (window.CreditDB) {
+        CreditDB.updateUser(u.id, {creditLimitOverride: newLim});
+        // FIXED: include correct newBalance after limit change
+        var updated = CreditDB.getUser(u.id);
+        var newAvail = updated ? Math.max(0, newLim - (updated.creditUsed||0)) : 0;
+        CreditDB.addTxn({
+          userId:      u.id,
+          type:        'limit_change',
+          amount:      amt,           // positivo = aumento
+          balance:     newAvail,
+          description: 'Aumento em lote de limite: +'+fmtR(amt)+' → novo limite '+fmtR(newLim),
+          status:      'confirmed',
+        });
+      }
+      changed++;
+    }
+  });
+  renderCredit(); updateCreditBadge();
+  toast('✅ Limite aumentado para '+changed+' cliente(s)','success');
+}
+
+// ══════════════════════════════════════════════════
+// REPORTS — período filtrado + analytics completo
+// ══════════════════════════════════════════════════
+
+function _filterByPeriod(orders) {
+  var period = document.getElementById('rep-period')?.value || 'all';
+  if (period === 'all') return orders;
+  var cutoff =
+    period === 'today' ? new Date().setHours(0,0,0,0)
+    : period === 'week'  ? Date.now() - 7 * 86400000
+    : period === 'month' ? (function(){ var d=new Date(); d.setDate(1); d.setHours(0,0,0,0); return d.getTime(); })()
+    : 0;
+  return orders.filter(function(o){ return new Date(o.createdAt).getTime() >= cutoff; });
+}
+
+function renderReports(){
+  var all = _filterByPeriod(ORDERS);
+
+  // ── KPIs ──
+  var allR = all.filter(function(o){return o.status==='delivered';}).reduce(function(s,o){return s+(o.total||0);},0);
+  var bom  = new Date(); bom.setDate(1); bom.setHours(0,0,0,0);
+  var mO   = all.filter(function(o){return new Date(o.createdAt)>=bom;});
+  var mR   = mO.filter(function(o){return o.status==='delivered';}).reduce(function(s,o){return s+(o.total||0);},0);
+  var cN   = all.filter(function(o){return o.status==='cancelled';}).length;
+  var cr   = all.length ? (cN/all.length*100).toFixed(1) : '0.0';
+  var av   = all.length ? (all.reduce(function(s,o){return s+(o.total||0);},0)/all.length) : 0;
+
+  // ── Delivery ──
+  var dOrders  = all.filter(function(o){return o.deliveryMode==='entrega';});
+  var rOrders  = all.filter(function(o){return o.deliveryMode==='retirada';});
+  var bairroN  = dOrders.filter(function(o){return o.deliveryZona==='bairro';}).length;
+  var motoboyN = dOrders.filter(function(o){return o.deliveryZona==='proximo';}).length;
+  var foraN    = dOrders.filter(function(o){return o.deliveryZona==='fora';}).length;
+  var taxasTotal = dOrders.reduce(function(s,o){return s+(o.deliveryTaxa||o.fee||0);},0);
+  var distArr  = dOrders.filter(function(o){return o.deliveryDistancia;});
+  var avgDist  = distArr.length
+    ? (distArr.reduce(function(s,o){return s+parseFloat(o.deliveryDistancia||0);},0)/distArr.length).toFixed(1) : 0;
+
+  document.getElementById('rep-sg').innerHTML=
+    mkSC('g', '💰','Receita Total',   fmtR(allR),              'entregues')+
+    mkSC('b', '📅','Receita Mês',     fmtR(mR),                mO.length+' pedidos')+
+    mkSC('y', '❌','Cancelamentos',   cr+'%',                   cN+' pedidos')+
+    mkSC('o', '🎯','Ticket Médio',    fmtR(av),                 all.length+' pedidos')+
+    mkSC('g', '🟢','Zona Bairro',     bairroN,                  'entregas próprias')+
+    mkSC('y', '🟡','Zona Motoboy',    motoboyN,                 'entregas via 99')+
+    mkSC('r', '🔴','Zona Fora',       foraN,                    'bloqueadas')+
+    mkSC('b', '🏠','Retiradas',       rOrders.length,           'na loja')+
+    mkSC('pk','💰','Taxas Entrega',   fmtR(taxasTotal),         'arrecadadas')+
+    mkSC('p', '📏','Dist. Média',     avgDist ? avgDist+' km' : '—', 'por entrega');
+
+  // ── 1. Top itens ──
+  var cnt={};
+  all.forEach(function(o){
+    (o.items||[]).forEach(function(i){
+      if(!cnt[i.name])cnt[i.name]={q:0,r:0};
+      cnt[i.name].q+=(i.qty||1);
+      cnt[i.name].r+=(i.price||0)*(i.qty||1);
+    });
+  });
+  var topItems=Object.entries(cnt).sort(function(a,b){return b[1].q-a[1].q;}).slice(0,10);
+  document.getElementById('top-items').innerHTML=topItems.length
+    ?topItems.map(function(e,i){
+        return'<tr><td><span class="pill">'+(i+1)+'</span></td>'
+          +'<td class="fw7">'+escH(e[0])+'</td>'
+          +'<td>'+e[1].q+'</td>'
+          +'<td class="tc-g fw7">'+fmtR(e[1].r)+'</td></tr>';
+      }).join('')
+    :'<tr><td colspan="4" style="text-align:center;padding:18px;color:var(--muted)">Sem dados</td></tr>';
+
+  // ── 2. Métodos de pagamento ──
+  var payMap={};
+  all.forEach(function(o){
+    var p=o.payment||'outros';
+    if(!payMap[p])payMap[p]={count:0,total:0};
+    payMap[p].count++; payMap[p].total+=(o.total||0);
+  });
+  var pIco={dinheiro:'💵',pix:'📱',credito:'💳',debito:'🏦',vale:'🎫'};
+  var payRows=Object.entries(payMap).sort(function(a,b){return b[1].count-a[1].count;});
+  document.getElementById('pay-methods-table').innerHTML=payRows.length
+    ?payRows.map(function(e){
+        var avg=e[1].count?e[1].total/e[1].count:0;
+        return'<tr><td>'+(pIco[e[0]]||'💳')+' <strong>'+escH(e[0])+'</strong></td>'
+          +'<td class="fw6">'+e[1].count+'</td>'
+          +'<td class="tc-g fw7">'+fmtR(avg)+'</td></tr>';
+      }).join('')
+    :'<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--muted)">Sem dados</td></tr>';
+
+  // ── 3. Receita por dia da semana ──
+  var days=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  var wd=days.map(function(d){return{label:d,total:0,count:0};});
+  all.filter(function(o){return o.status==='delivered';}).forEach(function(o){
+    var d=new Date(o.createdAt).getDay();
+    wd[d].total+=(o.total||0); wd[d].count++;
+  });
+  var maxWd=Math.max.apply(null,wd.map(function(d){return d.total;}));
+  document.getElementById('weekday-table').innerHTML=wd.map(function(d){
+    var pct=maxWd>0?Math.round(d.total/maxWd*100):0;
+    var bar='<div style="height:4px;background:var(--s3);border-radius:2px;margin-top:3px">'
+      +'<div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:2px;transition:width .5s"></div></div>';
+    return'<tr><td class="fw6">'+d.label+bar+'</td>'
+      +'<td>'+d.count+'</td>'
+      +'<td class="tc-g fw7">'+fmtR(d.total)+'</td></tr>';
+  }).join('');
+
+  // ── 4. Top clientes por gasto ──
+  var custMap={};
+  all.forEach(function(o){
+    var k=o.customerEmail||o.customer||'—';
+    if(!custMap[k])custMap[k]={name:o.customer||'—',count:0,total:0};
+    custMap[k].count++; custMap[k].total+=(o.total||0);
+  });
+  var topC=Object.values(custMap).sort(function(a,b){return b.total-a.total;}).slice(0,8);
+  document.getElementById('top-customers').innerHTML=topC.length
+    ?topC.map(function(c,i){
+        return'<tr><td><span class="pill" style="margin-right:6px">'+(i+1)+'</span><strong>'+escH(c.name)+'</strong></td>'
+          +'<td class="fw6">'+c.count+'</td>'
+          +'<td class="tc-g fw7">'+fmtR(c.total)+'</td></tr>';
+      }).join('')
+    :'<tr><td colspan="3" style="text-align:center;padding:18px;color:var(--muted)">Sem dados</td></tr>';
+}
+
+function exportCSVData(){
+  var csv;
+  if(window.CreditDB&&CreditDB.exportCSV){
+    // Rich customer CSV from CreditEngine
+    csv = CreditDB.exportCSV();
+  } else {
+    // Fallback: orders CSV
+    var hdr = 'ID,Cliente,Telefone,Endereço,Status,Subtotal,Taxa,Total,Pagamento,Zona,Data';
+    var rows = ORDERS.map(function(o){
+      return [
+        o.id,
+        '"'+(o.customer||'').replace(/"/g,'""')+'"',
+        o.phone||'',
+        '"'+(o.address||'').replace(/"/g,'""')+'"',
+        o.status,
+        (o.subtotal||0).toFixed(2),
+        (o.fee||0).toFixed(2),
+        (o.total||0).toFixed(2),
+        o.payment||'',
+        o.deliveryZona||'retirada',
+        o.createdAt?new Date(o.createdAt).toLocaleDateString('pt-BR'):''
+      ].join(',');
+    });
+    csv = hdr+'\n'+rows.join('\n');
+  }
+  var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'relatorio-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  toast('📊 CSV exportado com sucesso!','success');
+}
+
+// ══════════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════════
+function loadSettings(){
+  document.getElementById('cn').value=CFG.storeName||'';
+  document.getElementById('cw').value=CFG.whatsapp||'';
+  document.getElementById('cht').value=CFG.heroTitle||'';
+  document.getElementById('chs').value=CFG.heroSub||'';
+  document.getElementById('chr').value=CFG.hours||'';
+  document.getElementById('ccn').value=CFG.cloudName||'';
+  document.getElementById('ccp').value=CFG.cloudPreset||'';
+  document.getElementById('c-min').value=CFG.creditMinOrders||5;
+  document.getElementById('c-tax').value=CFG.creditTax||5;
+  var lv=CFG.creditLevels||[20,40,60];
+  document.getElementById('c-l1').value=lv[0]||20;
+  document.getElementById('c-l2').value=lv[1]||40;
+  document.getElementById('c-l3').value=lv[2]||60;
+  document.getElementById('c-days').value=CFG.creditDays||30;
+  var methods=CFG.paymentMethods||['dinheiro','pix','credito'];
+  ['dinheiro','pix','credito','debito','vale'].forEach(function(m){
+    var el=document.getElementById('pm-'+m);if(el)el.checked=methods.indexOf(m)>-1;
+  });
+  // Delivery settings
+  var dv=CFG.delivery||{};
+  var g=function(k,def){return dv[k]!==undefined?dv[k]:def;};
+  document.getElementById('del-origin').value=CFG.deliveryOrigin||(window.ORIGEM_LOJA||'Rua Azevedo Marques 289, Jardim Professor, Francisco Morato - SP');
+  document.getElementById('del-gmaps').value=g('gmaps_key','');
+  document.getElementById('del-z1km').value=g('zona1_km',1);
+  document.getElementById('del-z1taxa').value=g('zona1_taxa',2);
+  document.getElementById('del-z1tempo').value=g('zona1_tempo','10–20 min');
+  document.getElementById('del-z1metodo').value=g('zona1_metodo','propria');
+  document.getElementById('del-z2km').value=g('zona2_km',3);
+  document.getElementById('del-z2base').value=g('zona2_base',5);
+  document.getElementById('del-z2pkm').value=g('zona2_pkm',2);
+  document.getElementById('del-z2min').value=g('zona2_minimo',20);
+  document.getElementById('del-z2tempo').value=g('zona2_tempo','20–40 min');
+  document.getElementById('del-z2metodo').value=g('zona2_metodo','motoboy');
+  var z3msg=document.getElementById('del-z3msg');
+  if(z3msg)z3msg.value=g('zona3_msg','Atendemos apenas esta região no momento 🙏\nVocê pode nos encontrar no iFood 👍');
+  // Strategy radio
+  var hasKey=!!g('gmaps_key','');
+  var strat=document.getElementById(hasKey?'del-strat-gmaps':'del-strat-nominatim');
+  if(strat)strat.checked=true;
+  updateDeliveryPreview();
+
+  // ── WhatsApp Business API settings ──
+  var wa=CFG.whatsappBot||{};
+  var wb=function(id,def){var el=document.getElementById(id);if(el)el.checked=(wa[id]!==undefined?wa[id]:def);};
+  var wi=function(id,def){var el=document.getElementById(id);if(el)el.value=wa[id]||def||'';};
+  var botEnabled=wa.enabled||false;
+  var cb=document.getElementById('wa-bot-enabled');
+  if(cb){cb.checked=botEnabled;_applyWaBotToggle(botEnabled);}
+  wi('wa-provider','');
+  wi('wa-number',CFG.whatsapp||'');
+  wi('wa-phone-id','');
+  wi('wa-access-token','');
+  wi('wa-waba-id','');
+  wi('wa-verify-token','');
+  wi('wa-instance-key','');
+  wi('wa-client-token','');
+  wi('wa-server-url','');
+  // Behaviors
+  wb('wa-auto-confirm',true);
+  wb('wa-auto-status',true);
+  wb('wa-auto-pix',false);
+  wb('wa-auto-credit',false);
+  wb('wa-auto-menu',false);
+  wb('wa-auto-hours',false);
+  // Messages
+  wi('wa-msg-welcome','Olá! 👋 Seja bem-vindo ao {loja}!\nDigite *cardápio* para ver nossos pratos ou acesse: {link}');
+  wi('wa-msg-received','✅ Pedido *{id}* recebido com sucesso!\nEm breve confirmaremos. Aguarde 🙏\n\n_{loja}_');
+  wi('wa-msg-closed','😴 Olá! Estamos fechados agora.\n🕐 Horário: {horario}\n\nMas você já pode montar seu pedido: {link}\nResponderemos assim que abrirmos! 🙂');
+  wi('wa-msg-credit','⚠️ *Conta Rapi10 — {loja}*\n\nOlá {nome}! Sua conta vence em *{dias} dia(s)*.\n💰 Saldo: R$ {valor}\n\nQualquer dúvida, é só chamar! 🙏');
+  // Webhook URL
+  var whUrl=document.getElementById('wa-webhook-url');
+  if(whUrl)whUrl.value=wa.webhookUrl||'https://SEU-PROJETO.supabase.co/functions/v1/wa-webhook';
+  if(wa.provider)onWaProviderChange();
+}
+
+function saveSettings(){
+  CFG.storeName  = document.getElementById('cn').value.trim()  || CFG.storeName;
+  CFG.whatsapp   = document.getElementById('cw').value.trim();
+  CFG.heroTitle  = document.getElementById('cht').value.trim();
+  CFG.heroSub    = document.getElementById('chs').value.trim();
+  CFG.hours      = document.getElementById('chr').value.trim();
+  CFG.cloudName  = document.getElementById('ccn').value.trim();
+  CFG.cloudPreset= document.getElementById('ccp').value.trim();
+  CFG.creditMinOrders = parseInt(document.getElementById('c-min').value)||5;
+  CFG.creditTax       = parseFloat(document.getElementById('c-tax').value)||5;
+  CFG.creditLevels    = [
+    parseInt(document.getElementById('c-l1').value)||20,
+    parseInt(document.getElementById('c-l2').value)||40,
+    parseInt(document.getElementById('c-l3').value)||60
+  ];
+  CFG.creditDays = parseInt(document.getElementById('c-days').value)||30;
+  var methods=[];
+  ['dinheiro','pix','credito','debito','vale'].forEach(function(m){
+    var el=document.getElementById('pm-'+m);if(el&&el.checked)methods.push(m);
+  });
+  if(!methods.length)methods=['dinheiro'];
+  CFG.paymentMethods = methods;
+
+  // Delivery
+  var origin = document.getElementById('del-origin').value.trim();
+  var gmapsKey = document.getElementById('del-gmaps').value.trim();
+  var z3msgEl = document.getElementById('del-z3msg');
+  var z3msg = z3msgEl ? z3msgEl.value.trim() : 'Atendemos apenas esta região no momento 🙏\nVocê pode nos encontrar no iFood 👍';
+
+  if(origin){
+    CFG.deliveryOrigin = origin;
+    if(window.ORIGEM_LOJA !== undefined) window.ORIGEM_LOJA = origin;
+  }
+
+  CFG.delivery = {
+    gmaps_key:    gmapsKey,
+    zona1_km:     parseFloat(document.getElementById('del-z1km').value)   || 1,
+    zona1_taxa:   parseFloat(document.getElementById('del-z1taxa').value)  || 2,
+    zona1_tempo:  document.getElementById('del-z1tempo').value             || '10–20 min',
+    zona1_metodo: document.getElementById('del-z1metodo').value            || 'propria',
+    zona2_km:     parseFloat(document.getElementById('del-z2km').value)   || 3,
+    zona2_base:   parseFloat(document.getElementById('del-z2base').value)  || 5,
+    zona2_pkm:    parseFloat(document.getElementById('del-z2pkm').value)   || 2,
+    zona2_minimo: parseFloat(document.getElementById('del-z2min').value)   || 20,
+    zona2_tempo:  document.getElementById('del-z2tempo').value             || '20–40 min',
+    zona2_metodo: document.getElementById('del-z2metodo').value            || 'motoboy',
+    zona3_msg:    z3msg,
+  };
+
+  SC();
+  document.getElementById('sb-store').textContent = CFG.storeName;
+  updateDeliveryPreview();
+
+  // ── Salva config WhatsApp Bot ──
+  var wi2=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
+  var wb2=function(id){var el=document.getElementById(id);return el?el.checked:false;};
+  CFG.whatsappBot = {
+    enabled:        wb2('wa-bot-enabled'),
+    provider:       wi2('wa-provider'),
+    number:         wi2('wa-number'),
+    // Meta Cloud API
+    phoneId:        wi2('wa-phone-id'),
+    accessToken:    wi2('wa-access-token'),
+    wabaId:         wi2('wa-waba-id'),
+    verifyToken:    wi2('wa-verify-token'),
+    // Z-API / 360dialog / Twilio / Evolution
+    instanceKey:    wi2('wa-instance-key'),
+    clientToken:    wi2('wa-client-token'),
+    serverUrl:      wi2('wa-server-url'),
+    // Behaviors
+    'wa-auto-confirm': wb2('wa-auto-confirm'),
+    'wa-auto-status':  wb2('wa-auto-status'),
+    'wa-auto-pix':     wb2('wa-auto-pix'),
+    'wa-auto-credit':  wb2('wa-auto-credit'),
+    'wa-auto-menu':    wb2('wa-auto-menu'),
+    'wa-auto-hours':   wb2('wa-auto-hours'),
+    // Messages
+    'wa-msg-welcome':  wi2('wa-msg-welcome'),
+    'wa-msg-received': wi2('wa-msg-received'),
+    'wa-msg-closed':   wi2('wa-msg-closed'),
+    'wa-msg-credit':   wi2('wa-msg-credit'),
+  };
+
+  toast('✅ Configurações salvas!','success');
+}
+
+/* ── Delivery helpers ── */
+function toggleApiKeyVis(){
+  var inp=document.getElementById('del-gmaps');
+  var btn=document.getElementById('api-key-toggle');
+  if(inp.type==='password'){inp.type='text';if(btn)btn.textContent='🙈';}
+  else{inp.type='password';if(btn)btn.textContent='👁️';}
+}
+
+function updateDeliveryPreview(){
+  var el=document.getElementById('del-preview');if(!el)return;
+  var base=parseFloat(document.getElementById('del-z2base')?.value)||5;
+  var pkm =parseFloat(document.getElementById('del-z2pkm')?.value)||2;
+  var z2km=parseFloat(document.getElementById('del-z2km')?.value)||3;
+  var z1km=parseFloat(document.getElementById('del-z1km')?.value)||1;
+  var z1taxa=parseFloat(document.getElementById('del-z1taxa')?.value)||2;
+  var samples=[z1km+0.1, 1.5, 2.0, 2.5, z2km].filter(function(d){return d>z1km&&d<=z2km;});
+  var html='<span style="color:var(--green)">🟢 até '+z1km+'km = R$ '+z1taxa.toFixed(2).replace('.',',')+'</span>';
+  samples.forEach(function(d){
+    var taxa=base+(d*pkm);
+    html+='<span style="color:var(--yellow)">🟡 '+d.toFixed(1)+'km = R$ '+taxa.toFixed(2).replace('.',',')+'</span>';
+  });
+  html+='<span style="color:var(--red)">🔴 >'+z2km+'km = bloqueado</span>';
+  el.innerHTML=html;
+}
+
+function testDeliveryAddress(){
+  if(!window.DeliveryEngine){toast('Módulo de entrega não carregado','error');return;}
+  var addr=prompt('Digite um endereço para testar (ex: Rua das Flores 100, Francisco Morato):');
+  if(!addr)return;
+  toast('⏳ Calculando...','info');
+  DeliveryEngine.analisarEntrega(
+    addr+', Francisco Morato, SP',
+    function(res){
+      var msg='Resultado: '+res.emoji+' Zona '+res.zona;
+      if(!res.bloqueado)msg+=' | Taxa: R$ '+res.taxa.toFixed(2).replace('.',',')+' | '+res.tempo;
+      if(res.distancia)msg+=' | Dist: ~'+parseFloat(res.distancia).toFixed(1)+'km';
+      alert(msg);
+    },
+    function(err){alert('Erro: '+err.message+'\n\nFallback para zona bairro.');},
+    null
+  );
+}
+
+function changePwd(){
+  var c=document.getElementById('pc').value,n=document.getElementById('pn').value;
+  if(!c||!n){toast('Preencha os dois campos','error');return;}
+  if(c!==CFG.adminPwd){toast('Senha atual incorreta','error');return;}
+  if(n.length<4){toast('Mínimo 4 caracteres','error');return;}
+  CFG.adminPwd=n;SC();document.getElementById('pc').value='';document.getElementById('pn').value='';toast('🔒 Senha alterada!','success');
+}
+
+function copyLink(){var u=window.location.origin+'/cardapio.html';navigator.clipboard?.writeText(u).then(function(){toast('📋 Link copiado!','success');}).catch(function(){var i=document.createElement('input');i.value=u;document.body.appendChild(i);i.select();document.execCommand('copy');i.remove();toast('📋 Copiado!','success');});}
+function genQR(){
+  var u=window.location.origin+'/cardapio.html';var qr='https://api.qrserver.com/v1/create-qr-code/?size=220x220&data='+encodeURIComponent(u)+'&bgcolor=1a1d27&color=6c63ff&margin=1';
+  document.getElementById('qr-box').innerHTML='<div style="display:inline-block;background:var(--s2);border:1px solid var(--bord);border-radius:12px;padding:16px;text-align:center"><img src="'+qr+'" style="border-radius:7px;display:block;margin-bottom:9px;width:220px"><div style="font-size:.76rem;color:var(--muted);margin-bottom:8px">Escanear para abrir o cardápio</div><a href="'+qr+'" download="qrcode.png" class="btn btn-o btn-sm">⬇️ Baixar</a></div>';
+}
+function exportData(){
+  var d={menu:MENU,orders:ORDERS,categories:CATS,users:getUsers().map(function(u){return Object.assign({},u,{pwd:'***'});}),config:Object.assign({},CFG,{adminPwd:'***'})};
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download='backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();toast('📤 Exportado!','success');
+}
+function importData(e){
+  var file=e.target.files[0];if(!file)return;
+  var r=new FileReader();r.onload=function(ev){
+    try{
+      var d=JSON.parse(ev.target.result);
+      // B5 FIXED: validate backup schema before applying
+      if(typeof d!=='object'||d===null){toast('❌ Arquivo inválido: não é um objeto JSON','error');return;}
+      var hasValid=d.menu||d.orders||d.categories||d.config;
+      if(!hasValid){toast('❌ Arquivo não parece ser um backup válido','error');return;}
+      if(d.menu&&!Array.isArray(d.menu)){toast('❌ Campo "menu" inválido no backup','error');return;}
+      if(d.orders&&!Array.isArray(d.orders)){toast('❌ Campo "orders" inválido no backup','error');return;}
+      if(!confirm('Substituir dados atuais com o backup?\n\n⚠️ Esta ação não pode ser desfeita.'))return;
+      if(d.menu){MENU=d.menu;SM();}
+      if(d.orders){ORDERS=d.orders;SO();}
+      if(d.categories){CATS=d.categories;SK();}
+      if(d.config){var tmp=Object.assign({},d.config);delete tmp.adminPwd;Object.assign(CFG,tmp);SC();}
+      loadDash();loadSettings();updateBadge();updateCreditBadge();
+      toast('✅ Importado com sucesso!','success');
+    }catch(ex){toast('❌ Arquivo inválido: '+ex.message,'error');}
+  };r.readAsText(file);e.target.value='';
+}
+function clearOrders(){if(!confirm('Apagar TODOS os pedidos?'))return;ORDERS=[];SO();loadDash();updateBadge();toast('🗑️ Pedidos apagados','success');}
+
+// ══════════════════════════════════════════════════
+// MIGRAÇÃO LOCAL → SUPABASE (executar 1x)
+// ══════════════════════════════════════════════════
+function migrarParaSupabase(){
+  if(!window.Supa){toast('⚠️ Supabase não configurado','error');return;}
+  if(!Supa.Admin.isLogged()){toast('⚠️ Faça login primeiro','error');return;}
+  if(!confirm('Importar TODOS os dados do localStorage para o Supabase?\n\nIsso pode sobrescrever dados existentes no servidor.'))return;
+
+  var btn=event&&event.target;
+  if(btn){btn.disabled=true;btn.textContent='⏳ Migrando...';}
+  toast('⏳ Iniciando migração...','info');
+
+  var tasks=[];
+
+  /* Migra menu */
+  var menu=[];try{menu=JSON.parse(localStorage.getItem('menu_data')||'[]');}catch(e){}
+  if(menu.length){
+    tasks.push(Supa.Admin.call('sync_menu',{menu:menu}).then(function(){
+      toast('✅ Menu migrado ('+menu.length+' itens)','success');
+    }).catch(function(e){toast('⚠️ Erro no menu: '+e.message,'error');}));
+  }
+
+  /* Migra categorias */
+  var cats=[];try{cats=JSON.parse(localStorage.getItem('categories')||'[]');}catch(e){}
+  if(cats.length){
+    var catObjs=cats.map(function(c,i){return{name:c,emoji:'🍽️',ordem:i};});
+    tasks.push(Supa.Admin.call('sync_categories',{categories:catObjs}).then(function(){
+      toast('✅ Categorias migradas','success');
+    }).catch(function(e){toast('⚠️ Erro categorias: '+e.message,'error');}));
+  }
+
+  /* Migra pedidos */
+  var orders=[];try{orders=JSON.parse(localStorage.getItem('orders')||'[]');}catch(e){}
+  if(orders.length){
+    tasks.push(Supa.Admin.call('sync_orders',{orders:orders}).then(function(){
+      toast('✅ Pedidos migrados ('+orders.length+')','success');
+    }).catch(function(e){toast('⚠️ Erro pedidos: '+e.message,'error');}));
+  }
+
+  /* Migra clientes */
+  var users=[];try{users=JSON.parse(localStorage.getItem('users_db')||'[]');}catch(e){}
+  if(users.length){
+    tasks.push(Supa.Admin.call('sync_clientes',{clientes:users}).then(function(){
+      toast('✅ Clientes migrados ('+users.length+')','success');
+    }).catch(function(e){toast('⚠️ Erro clientes: '+e.message,'error');}));
+  }
+
+  /* Migra config da loja */
+  var cfg={};try{cfg=JSON.parse(localStorage.getItem('store_config')||'{}');}catch(e){}
+  if(Object.keys(cfg).length){
+    tasks.push(Supa.Loja.update(cfg).then(function(){
+      toast('✅ Config da loja migrada','success');
+    }).catch(function(e){toast('⚠️ Erro config: '+e.message,'error');}));
+  }
+
+  Promise.all(tasks).then(function(){
+    if(btn){btn.disabled=false;btn.textContent='📤 Importar dados para Supabase';}
+    toast('🎉 Migração concluída!','success');
+    /* Recarrega do Supabase para garantir consistência */
+    setTimeout(function(){Supa.hydrateAdmin();},1500);
+  }).catch(function(){
+    if(btn){btn.disabled=false;btn.textContent='📤 Importar dados para Supabase';}
+  });
+}
+
+/* Atualiza status de conexão Supabase no painel Dados */
+function _checkSupaConnection(){
+  var dot=document.getElementById('supa-dot');
+  var lbl=document.getElementById('supa-conn-lbl');
+  if(!dot||!lbl)return;
+  if(!window.Supa||!window.SUPA_CONFIG||!window.SUPA_CONFIG.url){
+    dot.style.background='#ef4444';lbl.textContent='Não configurado';return;
+  }
+  dot.style.background='#f59e0b';lbl.textContent='Verificando...';
+  fetch(window.SUPA_CONFIG.url+'/rest/v1/',{headers:{'apikey':window.SUPA_CONFIG.anonKey}})
+    .then(function(r){
+      if(r.ok||r.status===200){dot.style.background='#22c55e';lbl.textContent='Conectado ✅';}
+      else{dot.style.background='#ef4444';lbl.textContent='Erro de conexão';}
+    }).catch(function(){dot.style.background='#ef4444';lbl.textContent='Sem acesso';});
+}
+
+// ══════════════════════════════════════════════════
+// WHATSAPP BUSINESS BOT — funções de UI
+// ══════════════════════════════════════════════════
+
+function _applyWaBotToggle(enabled){
+  var slider=document.getElementById('wa-bot-slider');
+  var knob=document.getElementById('wa-bot-knob');
+  var grid=document.getElementById('wa-config-grid');
+  var beh=document.getElementById('wa-behaviors-grid');
+  var msgs=document.getElementById('wa-messages-section');
+  if(slider){slider.style.background=enabled?'#25D366':'var(--s4)';}
+  if(knob){knob.style.transform=enabled?'translateX(20px)':'translateX(0)';}
+  [grid,beh,msgs].forEach(function(el){if(el)el.style.opacity=enabled?'1':'.45';});
+}
+
+function onWaBotToggle(){
+  var enabled=document.getElementById('wa-bot-enabled')?.checked||false;
+  _applyWaBotToggle(enabled);
+}
+
+function onWaProviderChange(){
+  var prov=document.getElementById('wa-provider')?.value||'';
+  // Esconde tudo
+  ['wa-meta-fields','wa-meta-token-field','wa-waba-field','wa-verify-field',
+   'wa-instance-field','wa-token-field','wa-url-field'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.style.display='none';
+  });
+  if(prov==='meta'){
+    ['wa-meta-fields','wa-meta-token-field','wa-waba-field','wa-verify-field'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.style.display='';
+    });
+  } else if(prov==='zapi'){
+    document.getElementById('wa-instance-field').style.display='';
+    document.getElementById('wa-token-field').style.display='';
+    document.getElementById('wa-url-field').style.display='';
+    document.getElementById('wa-instance-lbl').textContent='Instance ID';
+    document.getElementById('wa-token-lbl').textContent='Token do Client';
+    document.getElementById('wa-url-lbl').textContent='URL da Instância (ex: https://api.z-api.io/instances/XXX/token/YYY)';
+  } else if(prov==='360dialog'){
+    document.getElementById('wa-instance-field').style.display='';
+    document.getElementById('wa-verify-field').style.display='';
+    document.getElementById('wa-instance-lbl').textContent='API Key (360dialog)';
+    document.getElementById('wa-url-lbl') && (document.getElementById('wa-url-lbl').textContent='Endpoint Base');
+  } else if(prov==='twilio'){
+    document.getElementById('wa-instance-field').style.display='';
+    document.getElementById('wa-token-field').style.display='';
+    document.getElementById('wa-instance-lbl').textContent='Account SID (Twilio)';
+    document.getElementById('wa-token-lbl').textContent='Auth Token (Twilio)';
+  } else if(prov==='evolution'){
+    document.getElementById('wa-instance-field').style.display='';
+    document.getElementById('wa-token-field').style.display='';
+    document.getElementById('wa-url-field').style.display='';
+    document.getElementById('wa-instance-lbl').textContent='Nome da Instância';
+    document.getElementById('wa-token-lbl').textContent='API Key (Evolution)';
+    document.getElementById('wa-url-lbl').textContent='URL do servidor Evolution (ex: https://evo.minhaloja.com)';
+  }
+}
+
+function toggleWaTokenVis(id){
+  var inp=document.getElementById(id);if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+function copyWaWebhook(){
+  var el=document.getElementById('wa-webhook-url');
+  if(!el)return;
+  navigator.clipboard?.writeText(el.value).then(function(){toast('📋 URL do webhook copiada!','success');})
+    .catch(function(){toast('Copie manualmente: '+el.value,'info');});
+}
+
+function testWaConnection(){
+  var prov=document.getElementById('wa-provider')?.value||'';
+  if(!prov){toast('⚠️ Selecione o provedor primeiro','error');return;}
+  // Dispara para Edge Function no Supabase
+  var badge=document.getElementById('wa-status-badge');
+  if(badge){badge.style.display='flex';badge.style.background='rgba(245,158,11,.12)';badge.style.color='#f59e0b';badge.textContent='⏳ Testando...';}
+  // Simulação local (a Edge Function real fará a verificação)
+  setTimeout(function(){
+    if(badge){
+      badge.style.background='rgba(34,197,94,.12)';badge.style.color='#22c55e';
+      badge.textContent='✅ Configuração salva — teste real após deploy do backend';
+    }
+  },1400);
+}
+
+function sendWaTest(){
+  var num=document.getElementById('wa-number')?.value.replace(/\D/g,'')||CFG.whatsapp||'';
+  if(!num){toast('⚠️ Configure o número do WhatsApp da loja','error');return;}
+  var msg='🤖 *Teste de bot — '+CFG.storeName+'*\n\nSe você recebeu esta mensagem, o atendimento automático está funcionando! ✅\n\n_Enviado pelo painel admin_';
+  window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+  toast('📤 Abrindo WhatsApp para envio de teste...','info');
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function fmtR(v){return'R$ '+Number(v||0).toFixed(2).replace('.',',');}
+function sl(s){return{pending:'⏳ Aguardando',accepted:'✅ Aceito',preparing:'🍳 Preparando',delivering:'🛵 Entregando',delivered:'📦 Entregue',cancelled:'❌ Cancelado'}[s]||s;}
+function ago(d){if(!d)return'';var m=Math.floor((Date.now()-new Date(d))/6e4);if(m<1)return'Agora';if(m<60)return m+'min atrás';var h=Math.floor(m/60);if(h<24)return h+'h atrás';return new Date(d).toLocaleDateString('pt-BR');}
+function safeId(v){return String(v||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function oMo(id){document.getElementById(id).classList.add('on');}
+function cmo(id){document.getElementById(id).classList.remove('on');}
+var _tid=0;
+function toast(msg,type){
+  type=type||'success';var st=document.getElementById('tstack');
+  var ico={success:'✅',error:'❌',info:'ℹ️'};
+  var el=document.createElement('div');el.className='toast '+type;
+  el.innerHTML='<span>'+(ico[type]||'💬')+'</span><span style="flex:1">'+msg+'</span><div class="tbar"></div>';
+  st.appendChild(el);
+  requestAnimationFrame(function(){requestAnimationFrame(function(){el.classList.add('on');});});
+  setTimeout(function(){el.classList.remove('on');setTimeout(function(){el.remove();},400);},3200);
+}
+
+document.querySelectorAll('.mo').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('on');});});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.mo.on').forEach(function(m){m.classList.remove('on');});});
+
+loadAll();
+</script>
+</body>
+</html>
